@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 2 Counting Aligned Reads in Genomic Regions | A minimal quantitative RNAseq pipeline</title>
+  <meta name="description" content="A minimal guide to performing quantitative RNAseq" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 2 Counting Aligned Reads in Genomic Regions | A minimal quantitative RNAseq pipeline" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="A minimal guide to performing quantitative RNAseq" />
+  <meta name="github-repo" content="TeamMacLean/minimal_quant_rna_seq" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 2 Counting Aligned Reads in Genomic Regions | A minimal quantitative RNAseq pipeline" />
+  
+  <meta name="twitter:description" content="A minimal guide to performing quantitative RNAseq" />
+  
+
+<meta name="author" content="Dan MacLean" />
+
+
+<meta name="date" content="2020-01-24" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="running-deseq2.html"/>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A minimal alignment guide</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> About this course</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#prerequisites"><i class="fa fa-check"></i><b>1.1</b> Prerequisites</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#r-and-rstudio"><i class="fa fa-check"></i><b>1.1.1</b> R and RStudio</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#sample-reference-genome-and-reads"><i class="fa fa-check"></i><b>1.1.2</b> Sample reference genome and reads</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Counting Aligned Reads in Genomic Regions</a><ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#about-this-chapter"><i class="fa fa-check"></i><b>2.1</b> About this chapter</a></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#counting-the-number-of-reads-that-have-aligned-to-gene-regions"><i class="fa fa-check"></i><b>2.2</b> Counting the number of reads that have aligned to gene regions</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="intro.html"><a href="intro.html#atacr"><i class="fa fa-check"></i><b>2.2.1</b> atacR</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="intro.html"><a href="intro.html#preparing-the-input"><i class="fa fa-check"></i><b>2.3</b> Preparing the input</a><ul>
+<li class="chapter" data-level="2.3.1" data-path="intro.html"><a href="intro.html#the-gff-file"><i class="fa fa-check"></i><b>2.3.1</b> The GFF file</a></li>
+<li class="chapter" data-level="2.3.2" data-path="intro.html"><a href="intro.html#the-sample-information-file"><i class="fa fa-check"></i><b>2.3.2</b> The Sample Information file</a></li>
+<li class="chapter" data-level="2.3.3" data-path="intro.html"><a href="intro.html#the-bam-files"><i class="fa fa-check"></i><b>2.3.3</b> The BAM files</a></li>
+<li class="chapter" data-level="2.3.4" data-path="intro.html"><a href="intro.html#sample-files-for-this-chapter"><i class="fa fa-check"></i><b>2.3.4</b> Sample files for this chapter</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="intro.html"><a href="intro.html#running-make_counts"><i class="fa fa-check"></i><b>2.4</b> Running <code>make_counts()</code></a></li>
+<li class="chapter" data-level="2.5" data-path="intro.html"><a href="intro.html#summaries-and-diagnostic-plots"><i class="fa fa-check"></i><b>2.5</b> Summaries and Diagnostic plots</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="intro.html"><a href="intro.html#gene-count-plots"><i class="fa fa-check"></i><b>2.5.1</b> Gene Count Plots</a></li>
+<li class="chapter" data-level="2.5.2" data-path="intro.html"><a href="intro.html#comparing-samples-with-pca"><i class="fa fa-check"></i><b>2.5.2</b> Comparing Samples with PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="2.6" data-path="intro.html"><a href="intro.html#extracting-and-saving-the-count-matrix"><i class="fa fa-check"></i><b>2.6</b> Extracting and saving the count matrix</a><ul>
+<li class="chapter" data-level="2.6.1" data-path="intro.html"><a href="intro.html#saving-to-an-r-rds-file"><i class="fa fa-check"></i><b>2.6.1</b> Saving to an R RDS file</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="running-deseq2.html"><a href="running-deseq2.html"><i class="fa fa-check"></i><b>3</b> Running <code>DESeq2</code></a><ul>
+<li class="chapter" data-level="3.1" data-path="running-deseq2.html"><a href="running-deseq2.html#about-this-chapter-1"><i class="fa fa-check"></i><b>3.1</b> About this chapter</a></li>
+<li class="chapter" data-level="3.2" data-path="running-deseq2.html"><a href="running-deseq2.html#getting-the-count-matrix-and-describing-the-experiment-for-deseq2"><i class="fa fa-check"></i><b>3.2</b> Getting the count matrix and describing the experiment for DESeq2</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="running-deseq2.html"><a href="running-deseq2.html#the-count-matrix"><i class="fa fa-check"></i><b>3.2.1</b> The count matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="running-deseq2.html"><a href="running-deseq2.html#the-grouping-object"><i class="fa fa-check"></i><b>3.3</b> The ‘grouping’ object</a></li>
+<li class="chapter" data-level="3.4" data-path="running-deseq2.html"><a href="running-deseq2.html#running-deseq2-1"><i class="fa fa-check"></i><b>3.4</b> Running DESeq2</a></li>
+<li class="chapter" data-level="3.5" data-path="running-deseq2.html"><a href="running-deseq2.html#saving-the-results"><i class="fa fa-check"></i><b>3.5</b> Saving the results</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="next-steps.html"><a href="next-steps.html"><i class="fa fa-check"></i><b>4</b> Next Steps</a><ul>
+<li class="chapter" data-level="4.1" data-path="next-steps.html"><a href="next-steps.html#about-this-chapter-2"><i class="fa fa-check"></i><b>4.1</b> About this chapter</a></li>
+<li class="chapter" data-level="4.2" data-path="next-steps.html"><a href="next-steps.html#the-results-data-frame"><i class="fa fa-check"></i><b>4.2</b> The results data frame</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="next-steps.html"><a href="next-steps.html#which-p-value"><i class="fa fa-check"></i><b>4.2.1</b> Which <em>p</em> value?</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="next-steps.html"><a href="next-steps.html#filtering-rows-with-significant-p-values"><i class="fa fa-check"></i><b>4.3</b> Filtering rows with significant <em>p</em> values</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="next-steps.html"><a href="next-steps.html#filtering-up-and-down-genes"><i class="fa fa-check"></i><b>4.3.1</b> Filtering UP and DOWN genes</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="next-steps.html"><a href="next-steps.html#finding-gene-annotations"><i class="fa fa-check"></i><b>4.4</b> Finding gene annotations</a><ul>
+<li class="chapter" data-level="4.4.1" data-path="next-steps.html"><a href="next-steps.html#biomart"><i class="fa fa-check"></i><b>4.4.1</b> BioMart</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="next-steps.html"><a href="next-steps.html#further-questions"><i class="fa fa-check"></i><b>4.5</b> Further Questions</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A minimal quantitative RNAseq pipeline</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="intro" class="section level1">
+<h1><span class="header-section-number">Chapter 2</span> Counting Aligned Reads in Genomic Regions</h1>
+<div id="about-this-chapter" class="section level2">
+<h2><span class="header-section-number">2.1</span> About this chapter</h2>
+<ol style="list-style-type: decimal">
+<li>Questions</li>
+</ol>
+<ul>
+<li>How do I calculate counts of reads at genes from my alignments?</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Objectives</li>
+</ol>
+<ul>
+<li>Understand the basis for the gene region and read counting technique</li>
+<li>Understand what the count matrix represents</li>
+<li>Use the <code>make_counts()</code> function to make a count matrix</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Keypoints</li>
+</ol>
+<ul>
+<li>Gene regions are designated by coordinates in GFF files</li>
+<li>A count matrix is a table-like object of reads that are found in a given genomic region</li>
+<li>The count matrix is the main object in a DESeq analysis</li>
+</ul>
+<p>In this chapter we’ll look at the fundamentals of read counting from a BAM file of aligned reads.</p>
+</div>
+<div id="counting-the-number-of-reads-that-have-aligned-to-gene-regions" class="section level2">
+<h2><span class="header-section-number">2.2</span> Counting the number of reads that have aligned to gene regions</h2>
+<p>The basis of quantitative RNAseq is working out how many of our sequence reads have aligned to each gene. In broad terms this is done by taking the genomic coordinates of all the aligned reads (the start and end positions of the read’s alignment on the reference genome) and cross-referencing them with the positions of the genes from a gene file. The resulting table is called a count matrix. See the figure below for a representation.</p>
+<div class="figure"><span id="fig:unnamed-chunk-1"></span>
+<img src="fig/align.png" alt="A) Graphic of read alignment and gene position showing reads within genes. B) The equivalent count matrix that comes from this alignment" width="460" />
+<p class="caption">
+Figure 2.1: A) Graphic of read alignment and gene position showing reads within genes. B) The equivalent count matrix that comes from this alignment
+</p>
+</div>
+<p>It is our aim in this section to create a count matrix from BAM files.</p>
+<div id="atacr" class="section level3">
+<h3><span class="header-section-number">2.2.1</span> atacR</h3>
+<p><code>atacR</code> was initially designed to help with the analysis of ATAC-Cap-seq data, a quite differen sort of data to RNAseq, but as with many bioinformatics pipelines, the first steps are quite common so we can make use of the neat way <code>atacR</code> handles the count matrix creation in the helpful function <code>make_counts()</code></p>
+</div>
+</div>
+<div id="preparing-the-input" class="section level2">
+<h2><span class="header-section-number">2.3</span> Preparing the input</h2>
+<p>We needs three things to work: the BAM files, a GFF file and a file of sample information.</p>
+<div id="the-gff-file" class="section level3">
+<h3><span class="header-section-number">2.3.1</span> The GFF file</h3>
+<p>GFF files are one way among many of describing the positions of genes on a genome. Here’s a quick look at one.</p>
+<pre><code>chr123  .  gene  1300  1500  .  +  .  ID=gene1
+chr123  .  gene  1050  1500  .  +  .  ID=gene2
+</code></pre>
+<p>As you can see, it’s a simple file with a gene represented on each line, by its chromosome (<code>chr123</code>), its start and end and its strand. The best thing about GFF files is that usually we can just download them from the relevant genome website. They tend to be freely available.</p>
+</div>
+<div id="the-sample-information-file" class="section level3">
+<h3><span class="header-section-number">2.3.2</span> The Sample Information file</h3>
+<p>This file is a really simple file that references the BAM file of the alignment with the sample and replicate information. It has three columns: <code>sample_name</code>, <code>bam_file_path</code> and <code>treatment</code>.
+Here is an example.</p>
+<pre><code>## Parsed with column specification:
+## cols(
+##   treatment = col_character(),
+##   sample_name = col_character(),
+##   bam_file_path = col_character()
+## )</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">treatment</th>
+<th align="left">sample_name</th>
+<th align="left">bam_file_path</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">control</td>
+<td align="left">control_rep1</td>
+<td align="left">sample_data/control1/alignedSorted.bam</td>
+</tr>
+<tr class="even">
+<td align="left">control</td>
+<td align="left">control_rep2</td>
+<td align="left">sample_data/control2/alignedSorted.bam</td>
+</tr>
+<tr class="odd">
+<td align="left">control</td>
+<td align="left">control_rep3</td>
+<td align="left">sample_data/control3/alignedSorted.bam</td>
+</tr>
+<tr class="even">
+<td align="left">treatment</td>
+<td align="left">treatment_rep1</td>
+<td align="left">sample_data/treatment1/alignedSorted.bam</td>
+</tr>
+<tr class="odd">
+<td align="left">treatment</td>
+<td align="left">treatment_rep2</td>
+<td align="left">sample_data/treatment2/alignedSorted.bam</td>
+</tr>
+<tr class="even">
+<td align="left">treatment</td>
+<td align="left">treatment_rep3</td>
+<td align="left">sample_data/treatment3/alignedSorted.bam</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>sample_name</code> column describes the treatment and replicate performed, the <code>bam_file_path</code> describes the place in which the BAM file for that sample is saved and <code>treatment</code> is the general name for the treatment that was used; this column is usually not unique when you have replicates.</p>
+</div>
+<div id="the-bam-files" class="section level3">
+<h3><span class="header-section-number">2.3.3</span> The BAM files</h3>
+<p>The BAM files all come from a previously done alignment. The sample information file describes the place where they are kept and the sample they represent.</p>
+</div>
+<div id="sample-files-for-this-chapter" class="section level3">
+<h3><span class="header-section-number">2.3.4</span> Sample files for this chapter</h3>
+<p>All the files are provided for you in the sample data you downloaded as <code>50_genes.gff</code> and <code>sample_information.csv</code> and in the folders containing BAM files. Feel free to examine them and look at how they relate to each other.</p>
+<p>Once we have these files prepared, we can go on to use the <code>atacR</code> package to make the count matrix.</p>
+</div>
+</div>
+<div id="running-make_counts" class="section level2">
+<h2><span class="header-section-number">2.4</span> Running <code>make_counts()</code></h2>
+<p>First we must load in <code>atacR</code>. Type the following into the R console.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">library</span>(atacr)</a></code></pre></div>
+<p>Now we can do the counting with <code>make_counts()</code>. Here’s how to do it. Remember to properly describe the path to the files. The paths given here are correct if the files are in a folder called <code>sample_data</code> in the current working directory.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">count_information &lt;-<span class="st"> </span><span class="kw">make_counts</span>(<span class="st">&quot;sample_data/50_genes.gff&quot;</span>,</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">                                 <span class="st">&quot;sample_data/sample_information.csv&quot;</span>,</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">                                 <span class="dt">is_rnaseq =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">                                 )</a></code></pre></div>
+<p>The function should run and give no output. Note that it is important to set <code>is_rnaseq</code> to <code>TRUE</code> to tell the function to count appropriately. The results are saved in the <code>count_information</code> object.</p>
+</div>
+<div id="summaries-and-diagnostic-plots" class="section level2">
+<h2><span class="header-section-number">2.5</span> Summaries and Diagnostic plots</h2>
+<p>With the counts computed we can do some diagnosis on the quality of the experiment.</p>
+<p>We can see summary information with the <code>summary()</code> function</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">summary</span>(count_information)</a></code></pre></div>
+<pre><code>## ATAC-seq experiment of 2 treatments in 6 samples
+##  Treatments: control,treatment 
+##  Samples: control_rep1,control_rep2,control_rep3,treatment_rep1,treatment_rep2,treatment_rep3 
+##  Bait regions used: 50 
+##  Total Windows: 99 
+##  
+##  On/Off target read counts:
+##            sample off_target on_target percent_on_target
+## 1   control_rep1          0     57733               100
+## 2   control_rep2          0     66155               100
+## 3   control_rep3          0     66122               100
+## 4 treatment_rep1          0    100547               100
+## 5 treatment_rep2          0    120325               100
+## 6 treatment_rep3          0    107611               100 
+##  Quantiles: 
+##  $bait_windows
+##     control_rep1 control_rep2 control_rep3 treatment_rep1 treatment_rep2
+## 1%        149.48       294.60       241.12         228.70         102.98
+## 5%        386.35       437.75       340.50         328.30         193.90
+## 95%      2335.20      2438.20      2927.10        4445.90        6940.20
+## 99%      3054.18      2752.19      3291.34        5234.33        9423.95
+##     treatment_rep3
+## 1%          116.50
+## 5%          324.00
+## 95%        4438.75
+## 99%        6948.15
+## 
+## $non_bait_windows
+##     control_rep1 control_rep2 control_rep3 treatment_rep1 treatment_rep2
+## 1%             0            0            0              0              0
+## 5%             0            0            0              0              0
+## 95%            0            0            0              0              0
+## 99%            0            0            0              0              0
+##     treatment_rep3
+## 1%               0
+## 5%               0
+## 95%              0
+## 99%              0
+##  
+##  Read depths:
+##            sample off_target on_target
+## 1   control_rep1          0   1154.66
+## 2   control_rep2          0   1323.10
+## 3   control_rep3          0   1322.44
+## 4 treatment_rep1          0   2010.94
+## 5 treatment_rep2          0   2406.50
+## 6 treatment_rep3          0   2152.22</code></pre>
+<p>It is long, but actually quite helpful. The first thing to note is that the words relate to ATAC-Cap-Seq, but in our context ‘bait regions’ just mean gene regions and non-bait just means intergenic regions. The ‘on_targets’ are read hits to genes, the ‘off_targets’ are read hits to intergenic regions.</p>
+<p>We can see that all the reads have hit in gene regions; that the read depth distribution of genes from the quantiles section give depths in the 1000 - 2000 range. This sort of summary is helpful when you’re trying to work out whether the RNAseq is useful, lots of reads ‘off target’ is bad, as is low depth.</p>
+<div id="gene-count-plots" class="section level3">
+<h3><span class="header-section-number">2.5.1</span> Gene Count Plots</h3>
+<p>We can see the distribution of depths over genes as a plot using the <code>plot_counts()</code> function</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">plot_counts</span>(count_information, <span class="dt">log10 =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<pre><code>## Picking joint bandwidth of 488</code></pre>
+<p><img src="01-counting_genes_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>We can see that the mean count per gene (windows in <code>atacR</code>) is about 1000. The distributions in the treatment are bit more skewed than the controls.</p>
+</div>
+<div id="comparing-samples-with-pca" class="section level3">
+<h3><span class="header-section-number">2.5.2</span> Comparing Samples with PCA</h3>
+<p>It is common to examine the similarity of the samples to each other before moving on with analysis, ideally the similar samples will cluster together.</p>
+<p>With <code>atacR</code> it is easy to perform a quick PCA analysis.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">sample_pca_plot</span>(count_information)</a></code></pre></div>
+<p><img src="01-counting_genes_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>Here we can see that the control samples all cluster together, but the treatment samples are a bit more variable. We might want to normalise these counts later as a consequence.</p>
+</div>
+</div>
+<div id="extracting-and-saving-the-count-matrix" class="section level2">
+<h2><span class="header-section-number">2.6</span> Extracting and saving the count matrix</h2>
+<p>We now want to extract out the actual counts hiding inside the <code>count_information</code> object, we can do this with the <code>assay()</code> extractor function from the <code>Summarized Experiment</code> package.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">library</span>(SummarizedExperiment)</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">raw_counts &lt;-<span class="st"> </span><span class="kw">assay</span>(count_information<span class="op">$</span>bait_windows)</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="kw">head</span>(raw_counts)</a></code></pre></div>
+<pre><code>##                        control_rep1 control_rep2 control_rep3
+## Chr1:245989-249141              670          784          548
+## Chr2:2195797-2200134           1104         1266          976
+## Chr3:2454387-2458244            703          922          198
+## Chr4:6650421-6657260           1865         1654         3207
+## Chr5:11798344-11805414         1482         1266         1646
+## Chr1:12893748-12901885         1186         1416         1458
+##                        treatment_rep1 treatment_rep2 treatment_rep3
+## Chr1:245989-249141               1784           2558            368
+## Chr2:2195797-2200134              358           1186           4436
+## Chr3:2454387-2458244             1373           1167           1726
+## Chr4:6650421-6657260             3533            703           2427
+## Chr5:11798344-11805414           1258           1690           1864
+## Chr1:12893748-12901885            834            594           2684</code></pre>
+<p>We can see the counts for each gene in each sample. Because <code>atacR</code> works on windows, the gene coordinates are given. We can replace the coordinates with gene names if we wish as follows</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">gene_names &lt;-<span class="st"> </span>readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;sample_data/gene_names.txt&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span> )<span class="op">$</span>X1</a></code></pre></div>
+<pre><code>## Parsed with column specification:
+## cols(
+##   X1 = col_character()
+## )</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">rownames</span>(raw_counts) &lt;-<span class="st"> </span>gene_names</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="kw">head</span>(raw_counts)</a></code></pre></div>
+<pre><code>##           control_rep1 control_rep2 control_rep3 treatment_rep1
+## AT1G01680          670          784          548           1784
+## AT1G07160         1104         1266          976            358
+## AT1G07920          703          922          198           1373
+## AT1G19250         1865         1654         3207           3533
+## AT1G32640         1482         1266         1646           1258
+## AT1G35210         1186         1416         1458            834
+##           treatment_rep2 treatment_rep3
+## AT1G01680           2558            368
+## AT1G07160           1186           4436
+## AT1G07920           1167           1726
+## AT1G19250            703           2427
+## AT1G32640           1690           1864
+## AT1G35210            594           2684</code></pre>
+<p>In this code chunk we load in the gene names from a file <code>gene_names.txt</code> using the <code>readr</code> package. Then we use the <code>rownames()</code> function to set the row names of <code>raw_counts</code>. This <em>is</em> a little cumbersome. Often you’ll come across fiddly little things like this in bioinformatics analysis. If you ever get stuck feel free to come and chat to us in the bioinformatics team.</p>
+<p>Now we can save the matrix to a file for re-use and importing into other programs. We’ll do it in two ways 1) to a native R binary file that we can load straight in, 2) to a CSV file we can examine in programs including Excel.</p>
+<div id="saving-to-an-r-rds-file" class="section level3">
+<h3><span class="header-section-number">2.6.1</span> Saving to an R RDS file</h3>
+<p>To save as a native R object, use <code>saveRDS()</code>, passing the filename you wish to save to.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw">saveRDS</span>(raw_counts, <span class="st">&quot;sample_data/raw_counts.RDS&quot;</span>)</a></code></pre></div>
+<p>To save as a csv file use <code>write.table()</code>, again passing the filename you wish to save to.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">write.csv</span>( raw_counts, <span class="st">&quot;sample_data/raw_counts.csv&quot;</span>)</a></code></pre></div>
+<p>Now we can move on to using <code>DESeq</code>.</p>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="running-deseq2.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["Minimal Quantitative RNASeq Pipeline.pdf", "Minimal Quantitative RNASeq Pipeline.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

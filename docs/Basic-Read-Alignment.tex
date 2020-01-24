@@ -1,0 +1,1104 @@
+\documentclass[]{book}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={A minimal quantitative RNAseq Pipeline},
+            pdfauthor={Dan MacLean},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{natbib}
+\bibliographystyle{apalike}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{A minimal quantitative RNAseq Pipeline}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Dan MacLean}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{2020-01-22}
+
+\usepackage{booktabs}
+\usepackage{amsthm}
+\makeatletter
+\def\thm@space@setup{%
+  \thm@preskip=8pt plus 2pt minus 4pt
+  \thm@postskip=\thm@preskip
+}
+\makeatother
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{1}
+\tableofcontents
+}
+\hypertarget{about-this-course}{%
+\chapter{About this course}\label{about-this-course}}
+
+In this short course we'll look at a method for getting quantitative estimates of gene expression from RNAseq data. The course assumes that you will already have performed a read alignment so is \emph{not} a `read to results' course. The course is very brief and will show you how to use a perform a common pipeline centered around \texttt{DESeq} in \texttt{R} and \texttt{RStudio}
+
+I acknowledge that there are lots of other programs and methods - this course is \emph{not} meant to be comprehensive, it is meant to get you being productive. Seek out further advice if you need to run other programs or systems. Do be encouraged though, lots of what you learn here will be applicable to other pipelines for the same job (they all run in a similar manner with similar objects) so this is a good place to start.
+
+The course is intended to run on your `local' machine, that is to say, your laptop or desktop computer. In general these machines will be powerful enough for most datasets though the pipeline we will learn can be easily adapted for a high performance computing environment if you need greater computational power.
+
+\hypertarget{prerequisites}{%
+\section{Prerequisites}\label{prerequisites}}
+
+This course assumes that you are a little familiar with the basics of running R and R commands from the R console. You'll need to know the basics of typing in commands and getting output, not much more.
+
+\hypertarget{r-and-rstudio}{%
+\subsection{R and RStudio}\label{r-and-rstudio}}
+
+\hypertarget{installing-r}{%
+\subsubsection{Installing R}\label{installing-r}}
+
+Follow this link and install the right version for your operating system \url{https://www.stats.bris.ac.uk/R/}
+
+\hypertarget{installing-rstudio}{%
+\subsubsection{Installing RStudio}\label{installing-rstudio}}
+
+Follow this link and install the right version for your operating system \url{https://www.rstudio.com/products/rstudio/download/}
+
+\hypertarget{installing-r-packages-in-rstudio.}{%
+\subsubsection{Installing R packages in RStudio.}\label{installing-r-packages-in-rstudio.}}
+
+You'll need the following R packages:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  devtools
+\item
+  atacR
+\item
+  DESeq
+\end{enumerate}
+
+For simplicity, install them in that order.
+
+To install \texttt{devtools}:
+
+Start RStudio and use the \texttt{Packages} tab in lower right panel. Click the install button (top left of the panel) and enter the package name \texttt{devtools}, then click install as in this picture
+
+\begin{figure}
+\centering
+\includegraphics{fig/package_install.png}
+\caption{Installing Packages}
+\end{figure}
+
+To install \texttt{atacR}:
+
+Type the following into the RStudio console, \texttt{devtools::install\_github("TeamMacLean/atacr")}
+
+To install \texttt{DESeq}:
+
+Type the following into the RStudio console, \texttt{BiocManager::install("DESeq")}
+
+Now you are done! Everything is installed ready for you to work with. Next we need to get the sample data
+
+\hypertarget{sample-reference-genome-and-reads}{%
+\subsection{Sample reference genome and reads}\label{sample-reference-genome-and-reads}}
+
+You'll need this zip file of data: \href{https://github.com/TeamMacLean/basic_alignment/raw/master/sample_data/sample_data.zip}{sample\_data.zip} which contains a reference genome and a set of paired end reads. Download it, extract the files and put them into a folder on your machine. I suggest something like \texttt{Desktop/align\_tut}. This will be the directory we'll work from in the rest of the course.
+
+That's all you need to do the lesson. If you have any problems getting this going, then ask someone in the Bioinformatics Team and we'll help.
+
+\hypertarget{intro}{%
+\chapter{Counting Aligned Reads in Genomic Regions}\label{intro}}
+
+\hypertarget{about-this-chapter}{%
+\section{About this chapter}\label{about-this-chapter}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Questions
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  How do I calculate counts of reads at genes from my alignments?
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Objectives
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Understand the basis for the gene region and read counting technique
+\item
+  Understand what the count matrix represents
+\item
+  Use the \texttt{make\_counts()} function to make a count matrix
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Keypoints
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Gene regions are designated by coordinates in GFF files
+\item
+  A count matrix is a table-like object of reads that are found in a given genomic region
+\item
+  The count matrix is the main object in a DESeq analysis
+\end{itemize}
+
+In this chapter we'll look at the fundamentals of read counting from a BAM file of aligned reads.
+
+\hypertarget{counting-the-number-of-reads-that-have-aligned-to-gene-regions}{%
+\section{Counting the number of reads that have aligned to gene regions}\label{counting-the-number-of-reads-that-have-aligned-to-gene-regions}}
+
+The basis of quantitative RNAseq is working out how many of our sequence reads have aligned to each gene. In broad terms this is done by taking the genomic coordinates of all the aligned reads (the start and end positions of the read's alignment on the reference genome) and cross-referencing them with the positions of the genes from a gene file. The resulting table is called a count matrix. See the figure below for a representation.
+
+\begin{figure}
+\includegraphics[width=12.78in]{fig/align} \caption{A) Graphic of read alignment and gene position showing reads within genes. B) The equivalent count matrix that comes from this alignment}\label{fig:unnamed-chunk-1}
+\end{figure}
+
+It is our aim in this section to create a count matrix from BAM files.
+
+\hypertarget{atacr}{%
+\subsection{atacR}\label{atacr}}
+
+\texttt{atacR} was initially designed to help with the analysis of ATAC-Cap-seq data, a quite differen sort of data to RNAseq, but as with many bioinformatics pipelines, the first steps are quite common so we can make use of the neat way \texttt{atacR} handles the count matrix creation in the helpful function \texttt{make\_counts()}
+
+\hypertarget{preparing-the-input}{%
+\section{Preparing the input}\label{preparing-the-input}}
+
+We needs three things to work: the BAM files, a GFF file and a file of sample information.
+
+\hypertarget{the-gff-file}{%
+\subsection{The GFF file}\label{the-gff-file}}
+
+GFF files are one way among many of describing the positions of genes on a genome. Here's a quick look at one.
+
+\begin{verbatim}
+chr123  .  gene  1300  1500  .  +  .  ID=gene1
+chr123  .  gene  1050  1500  .  +  .  ID=gene2
+\end{verbatim}
+
+As you can see, it's a simple file with a gene represented on each line, by its chromosome (\texttt{chr123}), its start and end and its strand. The best thing about GFF files is that usually we can just download them from the relevant genome website. They tend to be freely available.
+
+\hypertarget{the-sample-information-file}{%
+\subsection{The Sample Information file}\label{the-sample-information-file}}
+
+This file is a really simple file that references the BAM file of the alignment with the sample and replicate information. It has three columns: \texttt{sample\_name}, \texttt{bam\_file\_path} and \texttt{treatment}.
+Here is an example.
+
+\begin{verbatim}
+## Parsed with column specification:
+## cols(
+##   treatment = col_character(),
+##   sample_name = col_character(),
+##   bam_file_path = col_character()
+## )
+\end{verbatim}
+
+\begin{tabular}{l|l|l}
+\hline
+treatment & sample\_name & bam\_file\_path\\
+\hline
+control & control\_rep1 & sample\_data/control1/alignedSorted.bam\\
+\hline
+control & control\_rep2 & sample\_data/control2/alignedSorted.bam\\
+\hline
+control & control\_rep3 & sample\_data/control3/alignedSorted.bam\\
+\hline
+treatment & treatment\_rep1 & sample\_data/treatment1/alignedSorted.bam\\
+\hline
+treatment & treatment\_rep2 & sample\_data/treatment2/alignedSorted.bam\\
+\hline
+treatment & treatment\_rep3 & sample\_data/treatment3/alignedSorted.bam\\
+\hline
+\end{tabular}
+
+The \texttt{sample\_name} column describes the treatment and replicate performed, the \texttt{bam\_file\_path} describes the place in which the BAM file for that sample is saved and \texttt{treatment} is the general name for the treatment that was used; this column is usually not unique when you have replicates.
+
+\hypertarget{the-bam-files}{%
+\subsection{The BAM files}\label{the-bam-files}}
+
+The BAM files all come from a previously done alignment. The sample information file describes the place where they are kept and the sample they represent.
+
+\hypertarget{sample-files-for-this-chapter}{%
+\subsection{Sample files for this chapter}\label{sample-files-for-this-chapter}}
+
+All the files are provided for you in the sample data you downloaded as \texttt{50\_genes.gff} and \texttt{sample\_information.csv} and in the folders containing BAM files. Feel free to examine them and look at how they relate to each other.
+
+Once we have these files prepared, we can go on to use the \texttt{atacR} package to make the count matrix.
+
+\hypertarget{running-make_counts}{%
+\section{\texorpdfstring{Running \texttt{make\_counts()}}{Running make\_counts()}}\label{running-make_counts}}
+
+First we must load in \texttt{atacR}. Type the following into the R console.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(atacr)}
+\end{Highlighting}
+\end{Shaded}
+
+Now we can do the counting with \texttt{make\_counts()}. Here's how to do it. Remember to properly describe the path to the files. The paths given here are correct if the files are in a folder called \texttt{sample\_data} in the current working directory.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{count_information <-}\StringTok{ }\KeywordTok{make_counts}\NormalTok{(}\StringTok{"sample_data/50_genes.gff"}\NormalTok{,}
+                                 \StringTok{"sample_data/sample_information.csv"}\NormalTok{,}
+                                 \DataTypeTok{is_rnaseq =} \OtherTok{TRUE}
+\NormalTok{                                 )}
+\end{Highlighting}
+\end{Shaded}
+
+The function should run and give no output. Note that it is important to set \texttt{is\_rnaseq} to \texttt{TRUE} to tell the function to count appropriately. The results are saved in the \texttt{count\_information} project.
+
+\hypertarget{summaries-and-diagnostic-plots}{%
+\section{Summaries and Diagnostic plots}\label{summaries-and-diagnostic-plots}}
+
+With the counts computed we can do some diagnosis on the quality of the experiment.
+
+We can see summary information with the \texttt{summary()} function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(count_information)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## ATAC-seq experiment of 2 treatments in 6 samples
+##  Treatments: control,treatment 
+##  Samples: control_rep1,control_rep2,control_rep3,treatment_rep1,treatment_rep2,treatment_rep3 
+##  Bait regions used: 50 
+##  Total Windows: 99 
+##  
+##  On/Off target read counts:
+##            sample off_target on_target percent_on_target
+## 1   control_rep1          0     57733               100
+## 2   control_rep2          0     66155               100
+## 3   control_rep3          0     66122               100
+## 4 treatment_rep1          0    100547               100
+## 5 treatment_rep2          0    120325               100
+## 6 treatment_rep3          0    107611               100 
+##  Quantiles: 
+##  $bait_windows
+##     control_rep1 control_rep2 control_rep3 treatment_rep1 treatment_rep2
+## 1%        149.48       294.60       241.12         228.70         102.98
+## 5%        386.35       437.75       340.50         328.30         193.90
+## 95%      2335.20      2438.20      2927.10        4445.90        6940.20
+## 99%      3054.18      2752.19      3291.34        5234.33        9423.95
+##     treatment_rep3
+## 1%          116.50
+## 5%          324.00
+## 95%        4438.75
+## 99%        6948.15
+## 
+## $non_bait_windows
+##     control_rep1 control_rep2 control_rep3 treatment_rep1 treatment_rep2
+## 1%             0            0            0              0              0
+## 5%             0            0            0              0              0
+## 95%            0            0            0              0              0
+## 99%            0            0            0              0              0
+##     treatment_rep3
+## 1%               0
+## 5%               0
+## 95%              0
+## 99%              0
+##  
+##  Read depths:
+##            sample off_target on_target
+## 1   control_rep1          0   1154.66
+## 2   control_rep2          0   1323.10
+## 3   control_rep3          0   1322.44
+## 4 treatment_rep1          0   2010.94
+## 5 treatment_rep2          0   2406.50
+## 6 treatment_rep3          0   2152.22
+\end{verbatim}
+
+It is long, but actually quite helpful. The first thing to note is that the words relate to ATAC-Cap-Seq, but in our context `bait regions' just mean gene regions and non-bait just means intergenic regions. The `on\_targets' are read hits to genes, the `off\_targets' are read hits to intergenic regions.
+
+We can see that all the reads have hit in gene regions; that the read depth distribution of genes from the quantiles section give depths in the 1000 - 2000 range. This sort of summary is helpful when you're trying to work out whether the RNAseq is useful, lots of reads `off target' is bad, as is low depth.
+
+\hypertarget{gene-count-plots}{%
+\subsection{Gene Count Plots}\label{gene-count-plots}}
+
+We can see the distribution of depths over genes as a plot using the \texttt{plot\_counts()} function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot_counts}\NormalTok{(count_information, }\DataTypeTok{log10 =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Picking joint bandwidth of 488
+\end{verbatim}
+
+\includegraphics{01-intro_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+We can see that the mean count per gene (windows in \texttt{atacR}) is about 1000. The distributions in the treatment are bit more skewed than the controls.
+
+\hypertarget{comparing-samples-with-pca}{%
+\subsection{Comparing Samples with PCA}\label{comparing-samples-with-pca}}
+
+It is common to examine the similarity of the samples to each other before moving on with analysis, ideally the similar samples will cluster together.
+
+With \texttt{atacR} it is easy to perform a quick PCA analysis.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sample_pca_plot}\NormalTok{(count_information)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{01-intro_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+Here we can see that the control samples all cluster together, but the treatment samples are a bit more variable. We might want to normalise these counts later as a consequence.
+
+\hypertarget{extracting-and-saving-the-count-matrix}{%
+\section{Extracting and saving the count matrix}\label{extracting-and-saving-the-count-matrix}}
+
+We now want to extract out the actual counts hiding inside the \texttt{count\_information} object, we can do this with the \texttt{assay()} extractor function from the \texttt{Summarized\ Experiment} package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(SummarizedExperiment)}
+\NormalTok{raw_counts <-}\StringTok{ }\KeywordTok{assay}\NormalTok{(count_information}\OperatorTok{$}\NormalTok{bait_windows)}
+
+\KeywordTok{head}\NormalTok{(raw_counts)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                        control_rep1 control_rep2 control_rep3
+## Chr1:245989-249141              670          784          548
+## Chr2:2195797-2200134           1104         1266          976
+## Chr3:2454387-2458244            703          922          198
+## Chr4:6650421-6657260           1865         1654         3207
+## Chr5:11798344-11805414         1482         1266         1646
+## Chr1:12893748-12901885         1186         1416         1458
+##                        treatment_rep1 treatment_rep2 treatment_rep3
+## Chr1:245989-249141               1784           2558            368
+## Chr2:2195797-2200134              358           1186           4436
+## Chr3:2454387-2458244             1373           1167           1726
+## Chr4:6650421-6657260             3533            703           2427
+## Chr5:11798344-11805414           1258           1690           1864
+## Chr1:12893748-12901885            834            594           2684
+\end{verbatim}
+
+We can see the counts for each gene in each sample. Because \texttt{atacR} works on windows, the gene coordinates are given. We can replace the coordinates with gene names if we wish as follows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gene_names <-}\StringTok{ }\NormalTok{readr}\OperatorTok{::}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"sample_data/gene_names.txt"}\NormalTok{, }\DataTypeTok{col_names =} \OtherTok{FALSE}\NormalTok{ )}\OperatorTok{$}\NormalTok{X1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Parsed with column specification:
+## cols(
+##   X1 = col_character()
+## )
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{rownames}\NormalTok{(raw_counts) <-}\StringTok{ }\NormalTok{gene_names}
+\KeywordTok{head}\NormalTok{(raw_counts)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           control_rep1 control_rep2 control_rep3 treatment_rep1
+## AT1G01680          670          784          548           1784
+## AT1G07160         1104         1266          976            358
+## AT1G07920          703          922          198           1373
+## AT1G19250         1865         1654         3207           3533
+## AT1G32640         1482         1266         1646           1258
+## AT1G35210         1186         1416         1458            834
+##           treatment_rep2 treatment_rep3
+## AT1G01680           2558            368
+## AT1G07160           1186           4436
+## AT1G07920           1167           1726
+## AT1G19250            703           2427
+## AT1G32640           1690           1864
+## AT1G35210            594           2684
+\end{verbatim}
+
+In this code chunk we load in the gene names from a file \texttt{gene\_names.txt} using the \texttt{readr} package. Then we use the \texttt{rownames()} function to set the row names of \texttt{raw\_counts}. This \emph{is} a little cumbersome. Often you'll come across fiddly little things like this in bioinformatics analysis. If you ever get stuck feel free to come and chat to us in the bioinformatics team.
+
+Now we can save the matrix to a file for re-use and importing into other programs. We'll do it in two ways 1) to a native R binary file that we can load straight in, 2) to a CSV file we can examine in programs including Excel.
+
+\hypertarget{saving-to-an-r-rds-file}{%
+\subsection{Saving to an R RDS file}\label{saving-to-an-r-rds-file}}
+
+To save as a native R object, use \texttt{saveRDS()}, passing the filename you wish to save to.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{saveRDS}\NormalTok{(raw_counts, }\StringTok{"sample_data/raw_counts.RDS"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+To save as a csv file use \texttt{write.table()}, again passing the filename you wish to save to.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{write.csv}\NormalTok{( raw_counts, }\StringTok{"sample_data/raw_counts.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Now we can move on to using \texttt{DESeq}.
+
+\hypertarget{running-minimap2}{%
+\chapter{\texorpdfstring{Running \texttt{minimap2}}{Running minimap2}}\label{running-minimap2}}
+
+Running \texttt{minimap2} takes only one step. Assuming we've already \texttt{cd}'d into the directory with the reads and reference we can use this command
+
+\begin{verbatim}
+  minimap2 -ax sr ecoli_genome.fa ecoli_left_R1.fq ecoli_right_R2.fq > aln.sam
+\end{verbatim}
+
+Try running that and see what happens\ldots{} You should get an output file in the working directory called \texttt{aln.sam}. On my machine this takes just a few seconds to run.
+
+Let's look at the command in detail.
+
+\hypertarget{the-minimap2-command-and-options}{%
+\section{\texorpdfstring{The \texttt{minimap2} command and options}{The minimap2 command and options}}\label{the-minimap2-command-and-options}}
+
+First we get this
+
+\begin{verbatim}
+  minimap2
+\end{verbatim}
+
+which is the name of the actual program we intend to run, so it isn't surprising that it comes first. The rest of the command are options (sometimes called arguments) telling the program how to behave and what it needs to know. Next up is this
+
+\begin{verbatim}
+           -ax sr
+\end{verbatim}
+
+which gives option \texttt{a} meaning print out SAM format data. And option \texttt{x} meaningwe wish to use a preset parameter set. The preset we wish to use comes after \texttt{x} and is \texttt{sr}, which stands for \texttt{short\ reads} and tells \texttt{minimap2} to use settings for short reads against a long genome. Next is this
+
+\begin{verbatim}
+                   ecoli_genome.fa ecoli_left_R1.fq ecoli_right_R2.fq
+\end{verbatim}
+
+which are the input files in the `reference' `left read' `right read' order. Finally, we have
+
+\begin{verbatim}
+                                                                       > aln.sam
+\end{verbatim}
+
+which is the \texttt{\textgreater{}} output redirect operator and the name of an output file to write to. This bit specifies where the output goes.
+
+So the structure of the \texttt{minimap2} command (like many other commands) is simply \texttt{program\_name\ options\ input\ output}.
+
+And this one command is all we need for a basic alignment with \texttt{minimap2}. We can now move on to the next step in the pipeline.
+
+\hypertarget{further-reading}{%
+\section{Further Reading}\label{further-reading}}
+
+\hypertarget{the-operator}{%
+\subsection{\texorpdfstring{The \texttt{\textgreater{}} operator}{The \textgreater{} operator}}\label{the-operator}}
+
+The \texttt{\textgreater{}} symbol is actually not part of the \texttt{minimap2} command at all, it is a general shortcut that means something like `catch the output from the process on the left and put it in the file on the right\texttt{.\ Think\ of\ the}\textgreater{}` as being a physical funnel catching the datastream! Because it's a general operator and not an option in a program, we can almost always use'\textgreater{}' to make output files. You'll see it pop up quite often
+
+\hypertarget{minimap2-further-instructions-and-github}{%
+\subsection{\texorpdfstring{\texttt{minimap2} further instructions and github}{minimap2 further instructions and github}}\label{minimap2-further-instructions-and-github}}
+
+The commands given here for \texttt{minimap2} are just a small selection of what are available. You can see the user guide at \href{https://github.com/lh3/minimap2}{GitHub}
+
+\hypertarget{filtering-badly-aligned-reads}{%
+\chapter{Filtering Badly Aligned Reads}\label{filtering-badly-aligned-reads}}
+
+Once we have an alignment, the next step is often to throw out the reads that align badly or not in pairs as we we expect. To do this we need to look at the alignments and assess them one-by-one. We'll need first to have some understanding of the output from our alignment, in this case \texttt{aln.sam} a SAM format file.
+
+\hypertarget{sam-format}{%
+\section{SAM Format}\label{sam-format}}
+
+Alignments are generally stored in SAM format, a standard for describing how each read aligned one-by-one. Each line carries the results for a single read. Let's examine a single reads alignment. Recall that we can look at one line in a file called \texttt{aln.sam} using \texttt{tail\ -n\ 1\ aln.sam} (this gives the bottom line in the file). Running this prints the following
+
+\begin{verbatim}
+NC_011750.1_1004492_1005000_1:0:0_3:0:0_1869f   147 NC_011750.1 1004931 33  70M =   1004492 -509 TTATATTATTTGGGTTCCTGTGCTGGCGGCTATCTGGAGTATTGGCAGCCTGACAAGCAATGCCTACAAA 2222222222222222222222222222222222222222222222222222222222222222222222  NM:i:3  ms:i:110    AS:i:110    nn:i:0 tp:A:P   cm:i:2  s1:i:59 s2:i:0  de:f:0.0429 rl:i:0
+\end{verbatim}
+
+On close inspection we can see this mess (which is only a single line) contains things like the read name, the position it maps to on the reference sequence, the read sequence, and lots of other strange things like \texttt{70M} and \texttt{de:f:0.0429}. The important thing to note is that these weird things are encoded quality information for this alignment, so we can - if we know how to manipulate those codes - select read alignment of the proper quality.
+
+Thankfully the program \texttt{samtools} makes this easy for us.
+
+\hypertarget{samtools}{%
+\section{\texorpdfstring{\texttt{samtools}}{samtools}}\label{samtools}}
+
+We can accomplish read filtering with the following command.
+
+\begin{verbatim}
+samtools view -S -h -q 25 -f 3 aln.sam > aln.filtered.sam
+\end{verbatim}
+
+Try running that and looking at the output file that is generated. You should have another SAM format file called \texttt{aln.filtered.sam} in your working directory.
+
+Let's take a look at that command in detail
+
+\hypertarget{the-samtools-command-and-options}{%
+\section{\texorpdfstring{The \texttt{samtools} command and options}{The samtools command and options}}\label{the-samtools-command-and-options}}
+
+Straight away, the command seems to fit the familiar \texttt{program\ name} \texttt{options} \texttt{files} pattern. It starts with
+
+\begin{verbatim}
+samtools
+\end{verbatim}
+
+which is the program name. Then we get the options
+
+\begin{verbatim}
+          view -S -h -q 25 -f 3
+\end{verbatim}
+
+The first option to \texttt{samtools} must be the name of the sub-program to run. There are lots of these as \texttt{samtools} is a suite of sub-programs. \texttt{view} is the option for working with alignments directly. The second option \texttt{-S} tells \texttt{samtools\ view} that we are handing it a SAM format file (soon we will hand it a different type) and \texttt{-h} tells it to show the header as well (each SAM file has a header that we sometimes don't want). The next two options are the important ones. \texttt{-q\ 25} will remove reads with a mapping quality (a measure of how well a read is aligned) lower than 25 (a reasonable score) and \texttt{-f\ 3} is a `flag' a really complex way of encoding alignment attributes (see Further Reading for more details). The important thing is that \texttt{3} means \texttt{keep\ reads\ that\ are\ paired\ and\ whose\ pair\ is\ mapped\ too}.
+
+At the end of the command is the input and output file information
+
+\begin{verbatim}
+                               aln.sam > aln.filtered.sam
+\end{verbatim}
+
+which means the input file is our \texttt{aln.sam} and that the output should be redirected to \texttt{aln.filtered.sam}
+
+\hypertarget{checking-the-filtering}{%
+\section{Checking the filtering}\label{checking-the-filtering}}
+
+As an exercise to show that we did filter stuff out lets compare the input \texttt{aln.sam} file with the output \texttt{aln.filtered.sam} file. Recall that \texttt{wc\ -l} will give us the number of lines in a text file. Run it like this, on both files at once
+
+\begin{verbatim}
+wc -l aln.sam aln.filtered.sam
+\end{verbatim}
+
+I get this as output
+
+\begin{verbatim}
+  200002 aln.sam
+  166905 aln.filtered.sam
+  366907 total
+\end{verbatim}
+
+The number of lines (alignments) in the filtered files is less than that in the unfiltered, so we can casually assume the command worked.
+
+And that's all there is to getting the reads filtered. In real-life you have many options for filtering and you may choose to do it at other points (for instance, lots of RNAseq quantification programs will allow you to filter when you use them), but the process will be similar and take advantage of the same mapping quality and flag metrics you've been introduced to here.
+
+\hypertarget{are-we-done}{%
+\section{Are we done?}\label{are-we-done}}
+
+On the face of it then, it looks like we've come to the end of what we intended to do - we did an alignment, and we've filtered out the poor ones. In practice though, we'll be dealing with many millions of reads, many files of many Gb size. This complicates the housekeeping we have to do, not the procedure we've learned \emph{per se}, so before we jump to the HPC we need to look at that. That's the next chapter.
+
+\hypertarget{further-reading-1}{%
+\section{Further Reading}\label{further-reading-1}}
+
+\hypertarget{sam-format-1}{%
+\subsection{SAM Format}\label{sam-format-1}}
+
+I only really alluded to the SAM format above, but there's a lot to it. This \href{https://en.wikipedia.org/wiki/SAM_(file_format)}{Wikipedia page} gives a lot of detail.
+
+\hypertarget{mapping-quality}{%
+\subsection{Mapping Quality}\label{mapping-quality}}
+
+A metric that describes how well overall the read aligned, it takes into account not just the alignment, but the nubmer of other possible alignments that were rejected. Consider that a read mapping well equally at a number of places in the genome cannot be said to be mapping well at all. Different aligners make arbitrary decisions about how to score such alignments. See this short \href{https://genome.sph.umich.edu/wiki/Mapping_Quality_Scores}{summary} for information on how it can be calculated.
+
+\hypertarget{flags}{%
+\subsection{Flags}\label{flags}}
+
+The flags option is the most powerful way to describe a filter to \texttt{samtools\ view}, it is also really complicated. The number you pass (e.g \texttt{-f\ 3}) is calculated as a sum of lots of options. The way they're are described in the \href{https://en.wikipedia.org/wiki/SAM_(file_format)\#Bitwise_Flags}{documentation} is a bit more complex than I want to go into, but there are helpful web-apps that can simplify things - \href{https://broadinstitute.github.io/picard/explain-flags.html}{try this one}
+
+\hypertarget{connecting-programs-and-compressing-output}{%
+\chapter{Connecting Programs and Compressing output}\label{connecting-programs-and-compressing-output}}
+
+Now that we've been through the whole alignment and filtering pipeline, let's look at the output. Specifically lets compare the sizes of the files we used. Recall that we can do that with \texttt{ls\ -alh}
+
+On my folder I get this (some columns and files removed for clarity)
+
+\begin{verbatim}
+49M 29 Nov 10:46 aln.filtered.sam
+59M 28 Nov 16:28 aln.sam
+5.0M  2 Jul 15:04 ecoli_genome.fa
+18M 28 Nov 15:53 ecoli_left_R1.fq
+18M 28 Nov 15:53 ecoli_right_R2.fq
+\end{verbatim}
+
+The file sizes are in the left-most column. Check out the relative size of the two read files (18M each) and the alignment SAM files (59M and 49M). The output file is much larger than the input. This has implications for storage when the files are really large (many GB) and there are lots of them. The disk space gets used really quickly. Consider also the redundancy we have - that \texttt{aln.filtered.sam} is the one we're interested in, not the \texttt{aln.sam} so it is taking up unnecesary disk space. It's easy to see that when you are doing a real experiment with lots of samples and hundreds of GB file size, you're going to eat up disk space. Also larger files take longer to process, so you're going to have a long wait. This has implications too when you get to later stages in the analysis
+
+In this chapter we're going to look at a technique for reducing those housekeeping overheads and speeding things up.
+
+\hypertarget{bam-files}{%
+\section{BAM Files}\label{bam-files}}
+
+BAM files are a binary compressed version of SAM files. They contain identical information in a more computer friendly way. This means that people can't read it, but it is rare in practice that you'll directly read much of a SAM file with your own eyes. Let's look at the command to do that
+
+\begin{verbatim}
+samtools view -S -b aln.filtered.sam > aln.filtered.bam
+\end{verbatim}
+
+Again we're using \texttt{samtools\ view} and our options are \texttt{-S} which means SAM format input and the new one is \texttt{-b} means BAM format output. Our input file is \texttt{aln.filtered} and we're sending the output to \texttt{aln.filtered.bam}.
+
+If we check the files with \texttt{ls\ -alh} now we get
+
+\begin{verbatim}
+9.2M 29 Nov 14:05 aln.filtered.bam
+49M 29 Nov 10:46 aln.filtered.sam
+59M 28 Nov 16:28 aln.sam
+5.0M  2 Jul 15:04 ecoli_genome.fa
+18M 28 Nov 15:53 ecoli_left_R1.fq
+18M 28 Nov 15:53 ecoli_right_R2.fq
+\end{verbatim}
+
+The BAM file is about a fifth of the size of the SAM file. So we can save space in this way. We have another trick up our sleeve though. We can connect together command lines, so that we don't have to create intermediate files - this reduces the number of files we have to save. We can do this by using something called pipes.
+
+\hypertarget{connecting-program-input-and-output-with-pipes}{%
+\section{Connecting Program Input and Output With Pipes}\label{connecting-program-input-and-output-with-pipes}}
+
+Most command line programs print their results straight out without sending it to a file. This seems strange, but it adds a lot of flexibility. If also set up our programs to read in this output then we can connect them together. We can do this with pipes. The usual way to do this is to use the \texttt{\textbar{}} operator. Let's look at a common example.
+
+Here we'll use the command \texttt{ls} and \texttt{shuf} to see how this works. We know \texttt{ls} will `list' our directory contents, \texttt{shuf} shuffles lines of text sent to it. If we use \texttt{\textbar{}} in between we can connect the output of one to the other. Try running \texttt{ls} a couple of times to verify you get the same output both times and then try this
+a few times
+
+\begin{verbatim}
+ls | shuf
+\end{verbatim}
+
+you should get different output everytime. The important thing to note is that \texttt{shuf} is doing its job on the data sent from \texttt{ls}, which sends consistent data every time. We don't have to create an intermediate file for \texttt{shuf} to work from. The \texttt{\textbar{}} character joing two commands is the key.
+
+We can apply this to our \texttt{minimap2} and \texttt{samtools} commands.
+
+\hypertarget{from-reads-to-filtered-alignments-in-one-step}{%
+\section{From reads to filtered alignments in one step}\label{from-reads-to-filtered-alignments-in-one-step}}
+
+So let's try reducing the original alignment pipeline to one step with pipes. We'll work in the BAM file bit later.
+
+Simply take away the output file names (except the last one!) and replace with pipes. It looks like this
+
+\begin{verbatim}
+minimap2 -ax sr ecoli_genome.fa ecoli_left_R1.fq ecoli_right_R2.fq | samtools view -S -h -q 25 -f 3 > aln.filtered.from_pipes.sam
+\end{verbatim}
+
+when you do \texttt{ls\ -alh} you should see the new \texttt{aln.filtered.from\_pipes.sam} file, its size is identical to the file we generated when we created the intermediate \texttt{aln.sam} file, but this time we didnt need to, saving that disk space.
+
+\hypertarget{from-reads-to-filtered-alignments-in-a-bam-file-in-one-step}{%
+\subsection{From reads to filtered alignments in a BAM file in one step}\label{from-reads-to-filtered-alignments-in-a-bam-file-in-one-step}}
+
+Let's modify the command to give us BAM not SAM, saving a further step. We already know that \texttt{samtools\ view} can output BAM instead of SAM, so lets add that option (\texttt{-b}) in to the \texttt{samtools} part.
+
+\begin{verbatim}
+minimap2 -ax sr ecoli_genome.fa ecoli_left_R1.fq ecoli_right_R2.fq | samtools view -S -h -b -q 25 -f 3 > aln.filtered.from_pipes.bam
+\end{verbatim}
+
+If you check the files with \texttt{ls\ -alh} now you should see that you have the new \texttt{aln.filtered.from\_pipes.bam} file with no extra intermediate file and the smallest possible output file. Congratulations, you know now the fastest and most optimal way to make alignments and filter them.
+
+\hypertarget{sorting-bam-files}{%
+\section{Sorting BAM files}\label{sorting-bam-files}}
+
+In practice a BAM file of alignments needs to be ordered with the alignments at the start of the first chromosome at the start of the file and the alignments on the end of the last chromosome at the end of the file. This is for computational reasons we don't need to worry about, but it does mean we need to do another sorting step to make our files useful downstream.
+
+Because all the alignments need to be present before we can start we can't use the pipe technique above. So we use an input and output file. The command is \texttt{samtools\ sort} and looks like this.
+
+\begin{verbatim}
+samtools sort aln.filtered.from_pipes.bam -o aln.filtered.from_pipes.sorted.bam
+\end{verbatim}
+
+Doing \texttt{ls\ -alh} shows a new sorted BAM \texttt{aln.filtered.from\_pipes.sorted.bam} that contains the same information but is actually a little smaller due to being sorted. We can safely delete the unsorted version of the BAM file.
+
+\hypertarget{automatically-deleting-the-unsorted-bam}{%
+\subsection{Automatically deleting the unsorted BAM}\label{automatically-deleting-the-unsorted-bam}}
+
+If the sorting goes fine, we have two BAM files with essentially the same information and don't need the unsorted file. We can of course remove this with \texttt{rm\ aln.filtered.from\_pipes}. A neat space saving trick is to combine the \texttt{rm} step with the successful completion of the sort. We can do this by joining the commands with \texttt{\&\&}.
+
+That looks like this
+
+\begin{verbatim}
+samtools sort aln.filtered.from_pipes.bam -o aln.filtered.from_pipes.sorted.bam && rm aln.filtered.from_pipes.bam
+\end{verbatim}
+
+The \texttt{\&\&} doesn't connect the data between the two commands, it just doesn't let the second one start until the first one finishes successfully (computers have an internal concept of whether a command finished properly).
+
+This means if the \texttt{samtools\ sort} goes wrong the \texttt{rm} part will not run and the input file won't be deleted so you won't have to remake it. This is especially useful later when we wrap all this into an automatic script.
+
+\hypertarget{indexing-the-sorted-bam}{%
+\section{Indexing the sorted BAM}\label{indexing-the-sorted-bam}}
+
+Many downstream applications need the BAM file to have an index, so they can quickly jump to a particular part of the reference chromosome. This is a tiny file and we usually don't need to worry about it. To generate it use \texttt{samtools\ index}
+
+\begin{verbatim}
+samtools index aln.filtered.from_pipes.sorted.bam
+\end{verbatim}
+
+Using \texttt{ls\ -lah} we can see a tiny file called \texttt{aln.filtered.from\_pipes.sorted.bam.bai}, this is the index.
+
+\hypertarget{further-reading-2}{%
+\section{Further Reading}\label{further-reading-2}}
+
+For a primer on some more aspects of \texttt{samtools} see this \href{http://quinlanlab.org/tutorials/samtools/samtools.html}{tutorial}
+
+\hypertarget{automating-the-process}{%
+\chapter{Automating The Process}\label{automating-the-process}}
+
+We now know everything we need to do an alignment of reads against a reference in an efficient way. What's next is to consider that this process needs to be done for every set of reads you might generate. That's a lot of typing of the same thing over and over, which can get tedious. In this section we'll look at how we can automate the process to make it less repetitive using a script.
+
+\hypertarget{shell-scripts}{%
+\section{Shell scripts}\label{shell-scripts}}
+
+Scripts that contain commands we usually run in the Terminal are called shell scripts. They're generally just the command we want to do one after another and saved in a file. We can then run that file as if it were a command and all the commands we put in the file are
+
+Shell scripts must be a simple text file, so you can't create them in programs like Word, you'll need a special text editor. On most systems we have one called \texttt{nano} built into the Terminal.
+
+\hypertarget{using-nano-to-create-a-shell-script}{%
+\subsection{\texorpdfstring{Using \texttt{nano} to create a shell script}{Using nano to create a shell script}}\label{using-nano-to-create-a-shell-script}}
+
+To open a file in \texttt{nano} type \texttt{nano} and the name of the file, if the file doesn't exist it will be created.
+
+\begin{verbatim}
+nano my_script.sh
+\end{verbatim}
+
+Will create a file and open it. To save and exit type press \texttt{Ctrl} then \texttt{X} (thats what \texttt{\^{}X} means in the help at the bottom. You can enter your script in here. Remember its not a word processor, its a Terminal text editor, so you have to use the mouse to move round and cutting and pasting is a bit clunky.
+
+\hypertarget{creating-a-script-that-automates-our-alignment-pipeline.}{%
+\section{Creating a script that automates our alignment pipeline.}\label{creating-a-script-that-automates-our-alignment-pipeline.}}
+
+Let's enter our script into \texttt{nano}. We'll do it as we did in the earlier chapters, but we'll change file names to make it clear which files are coming from the script.
+
+First, create a script called \texttt{do\_aln.sh}
+
+\begin{verbatim}
+nano do_aln.sh
+\end{verbatim}
+
+Once \texttt{nano} opens, add the following into it
+
+\begin{verbatim}
+minimap2 -ax sr ecoli_genome.fa ecoli_left_R1.fq ecoli_right_R2.fq | samtools view -S -h -b -q 25 -f 3 > aln.script.bam
+samtools sort aln.script.bam -o aln.script.sorted.bam && rm aln.script.bam
+samtools index aln.script.sorted.bam
+\end{verbatim}
+
+That's all the steps we want to do. Use \texttt{Ctrl-X} to save the changes to the file.
+
+\hypertarget{running-the-script}{%
+\section{Running the script}\label{running-the-script}}
+
+To run the script we use the \texttt{sh} command and the script name. Try
+
+\begin{verbatim}
+sh do_aln.sh
+\end{verbatim}
+
+You should see progress from the script as it does each step in turn. When it's done you can \texttt{ls\ -alh} to see the new sorted BAM file from the script.
+
+Congratulations! You just automated an entire analysis pipeline!
+
+\hypertarget{running-on-different-input-files}{%
+\section{Running on different input files}\label{running-on-different-input-files}}
+
+So our script is great but the input filenames will be the same every time we run it meaning we'd need to go through the whole file and change them which is error prone. Also the output files are the same each time, meaning we could accidentally overwrite any previous work in there, which is frustrating. We can overcome this with a couple of simple changes in our script that make use of variables.
+
+Variables are place holders for values that the script will replace when it runs. Consider these two commands
+
+\begin{verbatim}
+MY_MESSAGE="Hello, world!"
+echo $MY_MESSAGE
+\end{verbatim}
+
+Recall that \texttt{echo} just prints whatever follows it. Try running this, you get \texttt{Hello,\ world!} which shows that the process created a variable called \texttt{MY\_MESSAGE} and stored the message in it. When used by a command the \texttt{\$} showed the command that it should use the message stored in the variable and printed \texttt{Hello,\ world!}. We can use this technique in our scripts. Note the command \texttt{MY\_MESSAGE="Hello,\ world!"} must not have spaces around the equals sign.
+
+Now we can expand our script to take advantage. Look at this script.
+
+\begin{verbatim}
+LEFT_READS="ecoli_left_R1.fq"
+RIGHT_READS="ecoli_right_R2.fq"
+REFERENCE_SEQUENCE="ecoli_genome.fa"
+SAMPLE_NAME="ecoli"
+
+minimap2 -ax sr $REFERENCE_SEQUENCE $LEFT_READS $RIGHT_READS | samtools view -S -h -b -q 25 -f 3 > $SAMPLE_NAME.bam
+samtools sort $SAMPLE_NAME.bam -o $SAMPLE_NAME.sorted.bam && rm $SAMPLE_NAME.bam
+samtools index $SAMPLE_NAME.sorted.bam
+\end{verbatim}
+
+Right at the top we create a variable for each of our read files (\texttt{LEFT\_READS} and \texttt{RIGHT\_READS}), our reference files (\texttt{REFERENCE\_SEQUENCE}) and a unique sample name (\texttt{ecoli}). These variables get used whenever we need them, saving us from typing the information over and over. The practical upshot of this being that we only need to change the script in one place every time we reuse it for a different sample and set of reads.
+
+Now try this out. Save the new script in a file called \texttt{do\_aln\_variables.sh} and run it as before with \texttt{sh\ do\_aln\_variables.sh}. When it's run you should see an output called \texttt{ecoli.sorted.bam}.
+
+\hypertarget{running-an-alignment-on-the-hpc}{%
+\chapter{Running an alignment on the HPC}\label{running-an-alignment-on-the-hpc}}
+
+In this chapter we'll look at how to run the alignment on an HPC cluster. First, we need to know a few things about that HPC before we can begin.
+
+\hypertarget{an-hpc-is-a-group-of-slave-computers-under-control-of-a-master-computer}{%
+\section{An HPC is a group of slave computers under control of a master computer}\label{an-hpc-is-a-group-of-slave-computers-under-control-of-a-master-computer}}
+
+Most of the computers in an HPC cluster are really just there to do what one other computer tells them. They cannot be contacted directly (by the normal user) and they have very little software already on them. As the user you must get a master computer to tell them what to do. A key thing about an HPC cluster is that all the computers share one massive hard-drive. Look at the diagram below.
+
+\includegraphics{hpc_graphic.png}
+
+It shows the computer you are working at, the master computer and it's relation to the slave computers and the hard disk. Note that there is no way for you to contact the slaves directly, even though the slaves (or more properly `worker nodes') are where the actual job runs. So the workflow for running an HPC job goes like this
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Log into master (more usually called `submission node' )
+\item
+  Prepare a task for the submission node to send to the nodes
+\item
+  Submit the task to the submission node
+\item
+  Wait for the submission node to send the job to the worker nodes
+\item
+  Wait for the worker nodes to finish the job
+\end{enumerate}
+
+In the rest of this chapter we'll look at how to do these steps
+
+\hypertarget{logging-into-the-submission-node}{%
+\section{Logging into the submission node}\label{logging-into-the-submission-node}}
+
+This is pretty straightforward, you need to use the \texttt{ssh} command to make a connection between your computer and the submission node. The TSL submission node has the address \texttt{hpc.tsl.ac.uk} so use this command
+
+\begin{verbatim}
+ssh hpc.tsl.ac.uk
+\end{verbatim}
+
+You'll be asked for a user name and password, it's your usual NBI details. When it's done you should see something like this
+
+\includegraphics{login.png}
+
+This terminal is now working on the submission node (you can tell from the prompt \texttt{macleand@TSL-HPC})
+
+\hypertarget{preparing-a-job}{%
+\section{Preparing a job}\label{preparing-a-job}}
+
+To run a job we need to create a submission script. \texttt{nano} is available on the submission node, so we can use that. But what goes inside? Here's a typical one.
+
+\begin{verbatim}
+#!/bin/bash
+
+#SBATCH -p tsl-short
+#SBATCH --mem=16G
+#SBATCH -c 4
+#SBATCH -J alignments
+#SBATCH --mail-type=begin,end,fail
+#SBATCH --mail-user=dan.maclean@tsl.ac.uk
+#SBATCH -o alignments.%j.out
+#SBATCH -e slurm.%j.err
+
+source minimap2-2.5
+source samtools-1.9
+
+srun minimap2 -ax sr ecoli_genome.fa ecoli_left_R1.fq ecoli_right_R2.fq | samtools view -S -h -b -q 25 -f 3 > aln.script.bam
+\end{verbatim}
+
+Not much of this is going to be familiar, but it isn't complicated.
+
+The first line of this file \texttt{\#!/bin/bash} is one that should always be there. Always put it in and never worry about it again. It just tells the computer this file is a script.
+
+\hypertarget{the-sbatch-options}{%
+\subsection{\texorpdfstring{The \texttt{\#SBATCH} options}{The \#SBATCH options}}\label{the-sbatch-options}}
+
+The second block of statements, all beginning \texttt{\#SBATCH} are the resource options for the job. It tells the submission node what resources the job needs to run. These need to go at the top of the script. Let's look at them individually.
+
+\hypertarget{sbatch--p}{%
+\subsubsection{\texorpdfstring{\texttt{\#SBATCH\ -p}}{\#SBATCH -p}}\label{sbatch--p}}
+
+This tells the submission node which queue (or partition in the jargon) the job should run on. We have three basic partitions \texttt{tsl-short}, \texttt{tsl-medium} and \texttt{tsl-long}. The main difference is that jobs that run for a short time shouldn't be held back by jobs that run for ages, so the submission node uses this to run all of its jobs optimally.
+
+\hypertarget{sbatch--c}{%
+\subsubsection{\texorpdfstring{\texttt{\#SBATCH\ -c}}{\#SBATCH -c}}\label{sbatch--c}}
+
+The number here tells the machine how many CPU's (processors) to use. Most tools will be able to make use of more than one and will run faster as a consequence. The job (usually) won't fail if you get this wrong, but it will take longer to start as it waits for more CPU's to come free.
+
+\hypertarget{sbatch---mem}{%
+\subsubsection{\texorpdfstring{\texttt{\#SBATCH\ -\/-mem=}}{\#SBATCH -\/-mem=}}\label{sbatch---mem}}
+
+This tells the submission node how much memory your job will need to run. Jobs that exceed their stated memory by too much are killed. REquestiing the lowest possible memory means your job will be executed more quickly. Memory is requested in units of \texttt{G} gigabytes, usually.
+
+\hypertarget{sbatch--j}{%
+\subsubsection{\texorpdfstring{\texttt{\#SBATCH\ -J}}{\#SBATCH -J}}\label{sbatch--j}}
+
+This is a helpful little name for you to identify your jobs with. eg \texttt{\#SBATCH\ -J\ my\_jobs}
+
+\hypertarget{sbatch---mail-type}{%
+\subsubsection{\texorpdfstring{\texttt{\#SBATCH\ -\/-mail-type=}}{\#SBATCH -\/-mail-type=}}\label{sbatch---mail-type}}
+
+These are the times during the job that the submission node will email you to let you know of a status change in your job. Always use this option as presented for quickest information.
+
+\hypertarget{sbatch---mail-user}{%
+\subsubsection{\texorpdfstring{\texttt{\#SBATCH\ -\/-mail-user}}{\#SBATCH -\/-mail-user}}\label{sbatch---mail-user}}
+
+This is simply the address your update emails will be sent to.
+
+\hypertarget{sbatch--o-and-sbatch--e}{%
+\subsubsection{\texorpdfstring{\texttt{\#SBATCH\ -o} and \texttt{\#SBATCH\ -e}}{\#SBATCH -o and \#SBATCH -e}}\label{sbatch--o-and-sbatch--e}}
+
+These are the names of files that output and errors will be sent to. On a long running process the output can get long so it goes to a file, not the email. The weird \texttt{\%j} is a job ID number that uniquely identifies the job.
+
+\hypertarget{the-source-options}{%
+\subsection{\texorpdfstring{The \texttt{source} options}{The source options}}\label{the-source-options}}
+
+The next lines all begin with the word \texttt{source} followed by some software name. No software is loaded into the worker nodes by default, so we need to say which tools we want to use. Do this by using the \texttt{source} keyword followed by the software name, e.g \texttt{source\ BLAST-2.2.2}. Many versions of the same tool are available on the HPC, and are differentiated by the version number at the end. You can see which software is available to source by typing \texttt{source} then hitting the tab key twice. It should give a very long list of tools.
+
+\hypertarget{the-srun-command}{%
+\subsection{\texorpdfstring{The \texttt{srun} command}{The srun command}}\label{the-srun-command}}
+
+Finally, we get to the actual commands we want to run. This is exactly as we did before but with the command \texttt{srun} in front.
+
+\hypertarget{submitting-with-sbatch}{%
+\section{\texorpdfstring{Submitting with \texttt{sbatch}}{Submitting with sbatch}}\label{submitting-with-sbatch}}
+
+All of this information should be saved in a single script. You can call it what you want, but use the extension \texttt{.sh}. Once you've got this script, you can ask the submission node to add your job to the queue with \texttt{sbatch}. This doesn't go in the script, it goes on the command-line, so if you'd added all the details above to a file called \texttt{do\_my\_alignments.sh} you can submit it by typing \texttt{sbatch\ do\_my\_alignments.sh}
+
+\hypertarget{checkout-tasks}{%
+\section{Checkout tasks}\label{checkout-tasks}}
+
+So that's all you need to know to submit a job. Let's test how that works by creating a simple job and running that. Then we'll try a bigger alignment job. These are
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Create a job using a submission script that runs this command \texttt{date}. Check what the \texttt{date} command does on the command line. Note that it runs very quickly (is a short job) and uses very little memory (\textless{} 1G) and only needs one CPU.
+\item
+  What happened to the output? Check the contents of your directory when the job is done and examine the new files (\texttt{less} is useful for this).
+\item
+  Explicitly create an output file by running this command through the HPC instead \texttt{date\ \textgreater{}\ date.txt}. What is the contents of the folder now? What effect did explicitly naming an output file have. What is the \texttt{slurm\_xxxx.out} file for?
+\item
+  Run an alignment job using the information we learned in the earlier chapters. The reference file \texttt{ecoli\_genome.fa}, \texttt{ecoli\_left\_R1.fq}, \texttt{ecoli\_right\_R2.fq} are available in the HPC filesystem in the folder. \texttt{/tsl/data/reads/bioinformatics/tutorial/alignments/}
+\end{enumerate}
+
+\hypertarget{further-reading-3}{%
+\section{Further Reading}\label{further-reading-3}}
+
+You can see more information about the cluster submission system and options at the CiS \href{https://docs.cis.nbi.ac.uk/display/CIS/Run+a+simple+job+on+the+cluster}{documentation site}
+
+\bibliography{book.bib,packages.bib}
+
+
+\end{document}

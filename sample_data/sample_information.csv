@@ -1,0 +1,7 @@
+treatment,sample_name,bam_file_path
+control,control_rep1,sample_data/control1/alignedSorted.bam
+control,control_rep2,sample_data/control2/alignedSorted.bam
+control,control_rep3,sample_data/control3/alignedSorted.bam
+treatment,treatment_rep1,sample_data/treatment1/alignedSorted.bam
+treatment,treatment_rep2,sample_data/treatment2/alignedSorted.bam
+treatment,treatment_rep3,sample_data/treatment3/alignedSorted.bam

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 3 Running DESeq2 | A minimal quantitative RNAseq pipeline</title>
+  <meta name="description" content="A minimal guide to performing quantitative RNAseq" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 3 Running DESeq2 | A minimal quantitative RNAseq pipeline" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="A minimal guide to performing quantitative RNAseq" />
+  <meta name="github-repo" content="TeamMacLean/minimal_quant_rna_seq" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Running DESeq2 | A minimal quantitative RNAseq pipeline" />
+  
+  <meta name="twitter:description" content="A minimal guide to performing quantitative RNAseq" />
+  
+
+<meta name="author" content="Dan MacLean" />
+
+
+<meta name="date" content="2020-01-24" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="intro.html"/>
+<link rel="next" href="next-steps.html"/>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A minimal alignment guide</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> About this course</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#prerequisites"><i class="fa fa-check"></i><b>1.1</b> Prerequisites</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#r-and-rstudio"><i class="fa fa-check"></i><b>1.1.1</b> R and RStudio</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#sample-reference-genome-and-reads"><i class="fa fa-check"></i><b>1.1.2</b> Sample reference genome and reads</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Counting Aligned Reads in Genomic Regions</a><ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#about-this-chapter"><i class="fa fa-check"></i><b>2.1</b> About this chapter</a></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#counting-the-number-of-reads-that-have-aligned-to-gene-regions"><i class="fa fa-check"></i><b>2.2</b> Counting the number of reads that have aligned to gene regions</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="intro.html"><a href="intro.html#atacr"><i class="fa fa-check"></i><b>2.2.1</b> atacR</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="intro.html"><a href="intro.html#preparing-the-input"><i class="fa fa-check"></i><b>2.3</b> Preparing the input</a><ul>
+<li class="chapter" data-level="2.3.1" data-path="intro.html"><a href="intro.html#the-gff-file"><i class="fa fa-check"></i><b>2.3.1</b> The GFF file</a></li>
+<li class="chapter" data-level="2.3.2" data-path="intro.html"><a href="intro.html#the-sample-information-file"><i class="fa fa-check"></i><b>2.3.2</b> The Sample Information file</a></li>
+<li class="chapter" data-level="2.3.3" data-path="intro.html"><a href="intro.html#the-bam-files"><i class="fa fa-check"></i><b>2.3.3</b> The BAM files</a></li>
+<li class="chapter" data-level="2.3.4" data-path="intro.html"><a href="intro.html#sample-files-for-this-chapter"><i class="fa fa-check"></i><b>2.3.4</b> Sample files for this chapter</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="intro.html"><a href="intro.html#running-make_counts"><i class="fa fa-check"></i><b>2.4</b> Running <code>make_counts()</code></a></li>
+<li class="chapter" data-level="2.5" data-path="intro.html"><a href="intro.html#summaries-and-diagnostic-plots"><i class="fa fa-check"></i><b>2.5</b> Summaries and Diagnostic plots</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="intro.html"><a href="intro.html#gene-count-plots"><i class="fa fa-check"></i><b>2.5.1</b> Gene Count Plots</a></li>
+<li class="chapter" data-level="2.5.2" data-path="intro.html"><a href="intro.html#comparing-samples-with-pca"><i class="fa fa-check"></i><b>2.5.2</b> Comparing Samples with PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="2.6" data-path="intro.html"><a href="intro.html#extracting-and-saving-the-count-matrix"><i class="fa fa-check"></i><b>2.6</b> Extracting and saving the count matrix</a><ul>
+<li class="chapter" data-level="2.6.1" data-path="intro.html"><a href="intro.html#saving-to-an-r-rds-file"><i class="fa fa-check"></i><b>2.6.1</b> Saving to an R RDS file</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="running-deseq2.html"><a href="running-deseq2.html"><i class="fa fa-check"></i><b>3</b> Running <code>DESeq2</code></a><ul>
+<li class="chapter" data-level="3.1" data-path="running-deseq2.html"><a href="running-deseq2.html#about-this-chapter-1"><i class="fa fa-check"></i><b>3.1</b> About this chapter</a></li>
+<li class="chapter" data-level="3.2" data-path="running-deseq2.html"><a href="running-deseq2.html#getting-the-count-matrix-and-describing-the-experiment-for-deseq2"><i class="fa fa-check"></i><b>3.2</b> Getting the count matrix and describing the experiment for DESeq2</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="running-deseq2.html"><a href="running-deseq2.html#the-count-matrix"><i class="fa fa-check"></i><b>3.2.1</b> The count matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="running-deseq2.html"><a href="running-deseq2.html#the-grouping-object"><i class="fa fa-check"></i><b>3.3</b> The ‘grouping’ object</a></li>
+<li class="chapter" data-level="3.4" data-path="running-deseq2.html"><a href="running-deseq2.html#running-deseq2-1"><i class="fa fa-check"></i><b>3.4</b> Running DESeq2</a></li>
+<li class="chapter" data-level="3.5" data-path="running-deseq2.html"><a href="running-deseq2.html#saving-the-results"><i class="fa fa-check"></i><b>3.5</b> Saving the results</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="next-steps.html"><a href="next-steps.html"><i class="fa fa-check"></i><b>4</b> Next Steps</a><ul>
+<li class="chapter" data-level="4.1" data-path="next-steps.html"><a href="next-steps.html#about-this-chapter-2"><i class="fa fa-check"></i><b>4.1</b> About this chapter</a></li>
+<li class="chapter" data-level="4.2" data-path="next-steps.html"><a href="next-steps.html#the-results-data-frame"><i class="fa fa-check"></i><b>4.2</b> The results data frame</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="next-steps.html"><a href="next-steps.html#which-p-value"><i class="fa fa-check"></i><b>4.2.1</b> Which <em>p</em> value?</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="next-steps.html"><a href="next-steps.html#filtering-rows-with-significant-p-values"><i class="fa fa-check"></i><b>4.3</b> Filtering rows with significant <em>p</em> values</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="next-steps.html"><a href="next-steps.html#filtering-up-and-down-genes"><i class="fa fa-check"></i><b>4.3.1</b> Filtering UP and DOWN genes</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="next-steps.html"><a href="next-steps.html#finding-gene-annotations"><i class="fa fa-check"></i><b>4.4</b> Finding gene annotations</a><ul>
+<li class="chapter" data-level="4.4.1" data-path="next-steps.html"><a href="next-steps.html#biomart"><i class="fa fa-check"></i><b>4.4.1</b> BioMart</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="next-steps.html"><a href="next-steps.html#further-questions"><i class="fa fa-check"></i><b>4.5</b> Further Questions</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A minimal quantitative RNAseq pipeline</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="running-deseq2" class="section level1">
+<h1><span class="header-section-number">Chapter 3</span> Running <code>DESeq2</code></h1>
+<div id="about-this-chapter-1" class="section level2">
+<h2><span class="header-section-number">3.1</span> About this chapter</h2>
+<ol style="list-style-type: decimal">
+<li>Questions</li>
+</ol>
+<ul>
+<li>How do I work out which genes are differentially regulated?</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Objectives</li>
+</ol>
+<ul>
+<li>Build a <code>DESeqDataSet</code> and <code>group</code> factor</li>
+<li>Run <code>DESeq</code></li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Keypoints</li>
+</ol>
+<ul>
+<li><code>DESeq2</code> is a package for estimating differential expression</li>
+<li><code>DESeq2</code> needs you to describe the experiment in order to work</li>
+</ul>
+<p>In this chapter we’ll look at how to take our count matrix through <code>DESeq2</code> to estimate differential expression of genes.</p>
+</div>
+<div id="getting-the-count-matrix-and-describing-the-experiment-for-deseq2" class="section level2">
+<h2><span class="header-section-number">3.2</span> Getting the count matrix and describing the experiment for DESeq2</h2>
+<div id="the-count-matrix" class="section level3">
+<h3><span class="header-section-number">3.2.1</span> The count matrix</h3>
+<p>The object we created in the previous chapter <code>raw_counts</code> is already in the format we need. If you carried straight into this chapter from the last one, then you already have what you need. If not, you can load in the saved version (there’s a copy in the sample data) as follows</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">raw_counts &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="st">&quot;sample_data/raw_counts.RDS&quot;</span>)</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="kw">head</span>(raw_counts)</a></code></pre></div>
+<pre><code>##           control_rep1 control_rep2 control_rep3 treatment_rep1
+## AT1G01680          670          784          548           1784
+## AT1G07160         1104         1266          976            358
+## AT1G07920          703          922          198           1373
+## AT1G19250         1865         1654         3207           3533
+## AT1G32640         1482         1266         1646           1258
+## AT1G35210         1186         1416         1458            834
+##           treatment_rep2 treatment_rep3
+## AT1G01680           2558            368
+## AT1G07160           1186           4436
+## AT1G07920           1167           1726
+## AT1G19250            703           2427
+## AT1G32640           1690           1864
+## AT1G35210            594           2684</code></pre>
+</div>
+</div>
+<div id="the-grouping-object" class="section level2">
+<h2><span class="header-section-number">3.3</span> The ‘grouping’ object</h2>
+<p>As R is a very powerful statistical programming language, it can support analysis of some very complicated experimental designs. <code>DESeq</code> supports this behaviour and as a result we have to describe our experiment in the appropriate manner.</p>
+<p>We need to create a <code>data.frame</code> object that states which group each column is in. A <code>data.frame</code> is basically an R analogue of an Excel sheet. We just need to work out the right order of sample types in the matrix column.</p>
+<p>Our experiment names are in the column names of the count matrix, we can see that with the <code>colnames()</code> function.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">colnames</span>(raw_counts)</a></code></pre></div>
+<pre><code>## [1] &quot;control_rep1&quot;   &quot;control_rep2&quot;   &quot;control_rep3&quot;   &quot;treatment_rep1&quot;
+## [5] &quot;treatment_rep2&quot; &quot;treatment_rep3&quot;</code></pre>
+<p>The controls are all in columns 1 to 3 and the treatments are in columns 4 to 6. To make the groupings we can just type in the sample types in the appropriate order and put them in a column of a <code>data.frame</code>. That looks like this</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">grouping &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">sample_type =</span>  <span class="kw">c</span>(<span class="st">&quot;control&quot;</span>, <span class="st">&quot;control&quot;</span>, <span class="st">&quot;control&quot;</span>, <span class="st">&quot;treatment&quot;</span>, <span class="st">&quot;treatment&quot;</span>, <span class="st">&quot;treatment&quot;</span>))</a>
+<a class="sourceLine" id="cb22-2" data-line-number="2">grouping</a></code></pre></div>
+<pre><code>##   sample_type
+## 1     control
+## 2     control
+## 3     control
+## 4   treatment
+## 5   treatment
+## 6   treatment</code></pre>
+</div>
+<div id="running-deseq2-1" class="section level2">
+<h2><span class="header-section-number">3.4</span> Running DESeq2</h2>
+<p>Now we have everything we need to run <code>DESeq2</code>. First, we must load in the library.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">library</span>(DESeq2)</a></code></pre></div>
+<p>Next, we can prepare the <code>DESeqDataSet</code> object that combines all the information <code>DESeq2</code> needs to work. We run <code>DESeqDataSetFromMatrix()</code> to do this.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">dds &lt;-<span class="st"> </span><span class="kw">DESeqDataSetFromMatrix</span>(</a>
+<a class="sourceLine" id="cb25-2" data-line-number="2">  <span class="dt">countData =</span> raw_counts, </a>
+<a class="sourceLine" id="cb25-3" data-line-number="3">  <span class="dt">colData =</span> grouping, </a>
+<a class="sourceLine" id="cb25-4" data-line-number="4">  <span class="dt">design =</span> <span class="op">~</span><span class="st"> </span>sample_type)</a></code></pre></div>
+<p>Here we set the arguments</p>
+<ol style="list-style-type: decimal">
+<li><code>countData</code> which is the actual data, so gets our <code>raw_counts</code></li>
+<li><code>colData</code> which tells the group each data column is in so gets <code>grouping</code></li>
+<li><code>design</code> is an R-ish way of describing the experiment design, for a standard exoeriment like this you use the <code>~</code> and the name of the <code>grouping</code> column</li>
+</ol>
+<p>Don’t worry too much about whether the <code>design</code> argument makes sense at this stage, its a bit out of scope to discuss the way R expects experimental designs for now. Follow the pattern you see here until you have a really complex design and have motivation to come back to it.</p>
+<p>Finally, we can do the <code>DESeq</code> analysis. We have a single function for this and all it needs is our prepared data.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">de_seq_analysed &lt;-<span class="st"> </span><span class="kw">DESeq</span>(dds)</a></code></pre></div>
+<p>And now we can extract the results with the helpful <code>results()</code> function. This needs the <code>contrast</code> to be described, basically the column name and the types.</p>
+<p>The types are ordered so that the first mentioned is the measurement of interest (ie the <code>treatment</code>) and the second is the baseline to which it is compared (here <code>control</code>). If you get the two the wrong way round, your up-regulated genes will look down-regulated and vice-versa, so take time to check.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">results_data &lt;-<span class="st"> </span><span class="kw">results</span>(de_seq_analysed, <span class="dt">contrast =</span> <span class="kw">c</span>(<span class="st">&#39;sample_type&#39;</span>, <span class="st">&#39;treatment&#39;</span>, <span class="st">&#39;control&#39;</span>))</a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">head</span>(results_data)</a></code></pre></div>
+<pre><code>## log2 fold change (MLE): sample_type treatment vs control 
+## Wald test p-value: sample type treatment vs control 
+## DataFrame with 6 rows and 6 columns
+##                   baseMean     log2FoldChange             lfcSE
+##                  &lt;numeric&gt;          &lt;numeric&gt;         &lt;numeric&gt;
+## AT1G01680 1022.39953137642  0.638556501008842 0.752757958605879
+## AT1G07160 1522.95786602724  0.354926012092298 0.785708629982376
+## AT1G07920 946.524794250111  0.671894996505363 0.742814441576441
+## AT1G19250 2230.10488838027 -0.591880977166901 0.603665159459885
+## AT1G32640 1539.40321179978 -0.420258753438091 0.537635950705001
+## AT1G35210 1384.96737134404 -0.485617346461465 0.690715741846472
+##                         stat            pvalue              padj
+##                    &lt;numeric&gt;         &lt;numeric&gt;         &lt;numeric&gt;
+## AT1G01680  0.848289272412955 0.396276890458589 0.747206163566895
+## AT1G07160   0.45172726701533 0.651465472435186 0.796576241413894
+## AT1G07920  0.904526028168531 0.365716539229272 0.747206163566895
+## AT1G19250 -0.980478942492676 0.326849759032812 0.747206163566895
+## AT1G32640 -0.781679039296026 0.434403223096372 0.755158226458792
+## AT1G35210 -0.703063962554663 0.482015889229017 0.755158226458792</code></pre>
+<p>We get a lot of information back in this column. We can see in amongst all that the important log fold change estimates and the adjusted p-value. Effectively, our analysis is done, we have our differential expression estimates, though we do need to do more to answer questions of interest. That’s what we’ll do in the next chapter</p>
+</div>
+<div id="saving-the-results" class="section level2">
+<h2><span class="header-section-number">3.5</span> Saving the results</h2>
+<p>As a final step, we can save the results to a CSV file. As in the earlier chapter we can do this with <code>write.csv()</code></p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="kw">write.csv</span>(results_data, <span class="st">&quot;sample_data/results.csv&quot;</span>)</a></code></pre></div>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="intro.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="next-steps.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["Minimal Quantitative RNASeq Pipeline.pdf", "Minimal Quantitative RNASeq Pipeline.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

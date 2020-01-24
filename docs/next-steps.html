@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 4 Next Steps | A minimal quantitative RNAseq pipeline</title>
+  <meta name="description" content="A minimal guide to performing quantitative RNAseq" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 4 Next Steps | A minimal quantitative RNAseq pipeline" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="A minimal guide to performing quantitative RNAseq" />
+  <meta name="github-repo" content="TeamMacLean/minimal_quant_rna_seq" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 4 Next Steps | A minimal quantitative RNAseq pipeline" />
+  
+  <meta name="twitter:description" content="A minimal guide to performing quantitative RNAseq" />
+  
+
+<meta name="author" content="Dan MacLean" />
+
+
+<meta name="date" content="2020-01-24" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="running-deseq2.html"/>
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A minimal alignment guide</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> About this course</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#prerequisites"><i class="fa fa-check"></i><b>1.1</b> Prerequisites</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#r-and-rstudio"><i class="fa fa-check"></i><b>1.1.1</b> R and RStudio</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#sample-reference-genome-and-reads"><i class="fa fa-check"></i><b>1.1.2</b> Sample reference genome and reads</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Counting Aligned Reads in Genomic Regions</a><ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#about-this-chapter"><i class="fa fa-check"></i><b>2.1</b> About this chapter</a></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#counting-the-number-of-reads-that-have-aligned-to-gene-regions"><i class="fa fa-check"></i><b>2.2</b> Counting the number of reads that have aligned to gene regions</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="intro.html"><a href="intro.html#atacr"><i class="fa fa-check"></i><b>2.2.1</b> atacR</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="intro.html"><a href="intro.html#preparing-the-input"><i class="fa fa-check"></i><b>2.3</b> Preparing the input</a><ul>
+<li class="chapter" data-level="2.3.1" data-path="intro.html"><a href="intro.html#the-gff-file"><i class="fa fa-check"></i><b>2.3.1</b> The GFF file</a></li>
+<li class="chapter" data-level="2.3.2" data-path="intro.html"><a href="intro.html#the-sample-information-file"><i class="fa fa-check"></i><b>2.3.2</b> The Sample Information file</a></li>
+<li class="chapter" data-level="2.3.3" data-path="intro.html"><a href="intro.html#the-bam-files"><i class="fa fa-check"></i><b>2.3.3</b> The BAM files</a></li>
+<li class="chapter" data-level="2.3.4" data-path="intro.html"><a href="intro.html#sample-files-for-this-chapter"><i class="fa fa-check"></i><b>2.3.4</b> Sample files for this chapter</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="intro.html"><a href="intro.html#running-make_counts"><i class="fa fa-check"></i><b>2.4</b> Running <code>make_counts()</code></a></li>
+<li class="chapter" data-level="2.5" data-path="intro.html"><a href="intro.html#summaries-and-diagnostic-plots"><i class="fa fa-check"></i><b>2.5</b> Summaries and Diagnostic plots</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="intro.html"><a href="intro.html#gene-count-plots"><i class="fa fa-check"></i><b>2.5.1</b> Gene Count Plots</a></li>
+<li class="chapter" data-level="2.5.2" data-path="intro.html"><a href="intro.html#comparing-samples-with-pca"><i class="fa fa-check"></i><b>2.5.2</b> Comparing Samples with PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="2.6" data-path="intro.html"><a href="intro.html#extracting-and-saving-the-count-matrix"><i class="fa fa-check"></i><b>2.6</b> Extracting and saving the count matrix</a><ul>
+<li class="chapter" data-level="2.6.1" data-path="intro.html"><a href="intro.html#saving-to-an-r-rds-file"><i class="fa fa-check"></i><b>2.6.1</b> Saving to an R RDS file</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="running-deseq2.html"><a href="running-deseq2.html"><i class="fa fa-check"></i><b>3</b> Running <code>DESeq2</code></a><ul>
+<li class="chapter" data-level="3.1" data-path="running-deseq2.html"><a href="running-deseq2.html#about-this-chapter-1"><i class="fa fa-check"></i><b>3.1</b> About this chapter</a></li>
+<li class="chapter" data-level="3.2" data-path="running-deseq2.html"><a href="running-deseq2.html#getting-the-count-matrix-and-describing-the-experiment-for-deseq2"><i class="fa fa-check"></i><b>3.2</b> Getting the count matrix and describing the experiment for DESeq2</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="running-deseq2.html"><a href="running-deseq2.html#the-count-matrix"><i class="fa fa-check"></i><b>3.2.1</b> The count matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="running-deseq2.html"><a href="running-deseq2.html#the-grouping-object"><i class="fa fa-check"></i><b>3.3</b> The ‘grouping’ object</a></li>
+<li class="chapter" data-level="3.4" data-path="running-deseq2.html"><a href="running-deseq2.html#running-deseq2-1"><i class="fa fa-check"></i><b>3.4</b> Running DESeq2</a></li>
+<li class="chapter" data-level="3.5" data-path="running-deseq2.html"><a href="running-deseq2.html#saving-the-results"><i class="fa fa-check"></i><b>3.5</b> Saving the results</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="next-steps.html"><a href="next-steps.html"><i class="fa fa-check"></i><b>4</b> Next Steps</a><ul>
+<li class="chapter" data-level="4.1" data-path="next-steps.html"><a href="next-steps.html#about-this-chapter-2"><i class="fa fa-check"></i><b>4.1</b> About this chapter</a></li>
+<li class="chapter" data-level="4.2" data-path="next-steps.html"><a href="next-steps.html#the-results-data-frame"><i class="fa fa-check"></i><b>4.2</b> The results data frame</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="next-steps.html"><a href="next-steps.html#which-p-value"><i class="fa fa-check"></i><b>4.2.1</b> Which <em>p</em> value?</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="next-steps.html"><a href="next-steps.html#filtering-rows-with-significant-p-values"><i class="fa fa-check"></i><b>4.3</b> Filtering rows with significant <em>p</em> values</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="next-steps.html"><a href="next-steps.html#filtering-up-and-down-genes"><i class="fa fa-check"></i><b>4.3.1</b> Filtering UP and DOWN genes</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="next-steps.html"><a href="next-steps.html#finding-gene-annotations"><i class="fa fa-check"></i><b>4.4</b> Finding gene annotations</a><ul>
+<li class="chapter" data-level="4.4.1" data-path="next-steps.html"><a href="next-steps.html#biomart"><i class="fa fa-check"></i><b>4.4.1</b> BioMart</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="next-steps.html"><a href="next-steps.html#further-questions"><i class="fa fa-check"></i><b>4.5</b> Further Questions</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A minimal quantitative RNAseq pipeline</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="next-steps" class="section level1">
+<h1><span class="header-section-number">Chapter 4</span> Next Steps</h1>
+<div id="about-this-chapter-2" class="section level2">
+<h2><span class="header-section-number">4.1</span> About this chapter</h2>
+<ol style="list-style-type: decimal">
+<li>Questions</li>
+</ol>
+<ul>
+<li>How can I filter out the ‘significant’ genes?</li>
+<li>How can I find the functions of these genes?</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Objectives</li>
+</ol>
+<ul>
+<li>Filter the genes by <em>p</em> value</li>
+<li>Find the gene annotations on an external service</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Keypoints</li>
+</ol>
+<ul>
+<li>The <em>p</em> value we need must be corrected for the large number of genes</li>
+</ul>
+<p>In this chapter we’ll look at how to take our results table and get the significantly differentially expressed genes out of it.</p>
+</div>
+<div id="the-results-data-frame" class="section level2">
+<h2><span class="header-section-number">4.2</span> The results data frame</h2>
+<p>The object we created in the previous chapter <code>results_data</code> is already in the general format we need. Im going to load a version with different gene names (from Magnaporthe, not Arabidopsis) so we can work on a more familiar genome.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">results_data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;sample_data/results_mo.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb30-2" data-line-number="2"><span class="kw">head</span>(results_data)</a></code></pre></div>
+<pre><code>##        gene  baseMean log2FoldChange     lfcSE       stat    pvalue
+## 1 MGG_00865 1022.3995      0.6385565 0.7527580  0.8482893 0.3962769
+## 2 MGG_08134 1522.9579      0.3549260 0.7857086  0.4517273 0.6514655
+## 3 MGG_01588  946.5248      0.6718950 0.7428144  0.9045260 0.3657165
+## 4 MGG_13806 2230.1049     -0.5918810 0.6036652 -0.9804789 0.3268498
+## 5 MGG_06121 1539.4032     -0.4202588 0.5376360 -0.7816790 0.4344032
+## 6 MGG_06504 1384.9674     -0.4856173 0.6907157 -0.7030640 0.4820159
+##        padj
+## 1 0.7472062
+## 2 0.7965762
+## 3 0.7472062
+## 4 0.7472062
+## 5 0.7551582
+## 6 0.7551582</code></pre>
+<div id="which-p-value" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> Which <em>p</em> value?</h3>
+<p>Note that two columns in this data.frame have <em>p</em> value information in them - <code>pvalue</code> and <code>padj</code>. Which is the correct one? We need the adjusted <em>p</em> value in <code>padj</code>.</p>
+<p>The reason for this is that a separate <em>p</em> value was calculated in a separate test for each gene. As <em>p</em> values have a built in error expectation (IE <em>p</em> = 0.05 means the test will be wrong 5 percent of the time on average) then repeating the test means that using a gene level <em>p</em> value means we get lots of errors. So we need a whole gene set <em>p</em> value rather than a per gene value. Hence <code>DESeq</code> adjusts the <em>p</em> value for the whole set of genes.</p>
+</div>
+</div>
+<div id="filtering-rows-with-significant-p-values" class="section level2">
+<h2><span class="header-section-number">4.3</span> Filtering rows with significant <em>p</em> values</h2>
+<p>To filter the rows in the data frame we can use <code>tidyverse</code> tools like <code>dplyr</code> (which we study in a separate training course). Let’s keep rows from the <code>results_data</code> data frame with a <code>padj</code> lower than <code>0.05</code></p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb32-2" data-line-number="2">significant_genes &lt;-<span class="st"> </span><span class="kw">filter</span>(results_data, padj <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>)</a>
+<a class="sourceLine" id="cb32-3" data-line-number="3">significant_genes</a></code></pre></div>
+<pre><code>##        gene  baseMean log2FoldChange     lfcSE     stat pvalue  padj
+## 1 MGG_12738  552.4170     -1.2700540 1.1960414 1.061881  0.005 0.030
+## 2 MGG_01482 1912.4502      1.1010845 0.8063151 1.365576  0.005 0.004
+## 3 MGG_17878  988.8704      0.9095213 0.9142498 0.994828  0.002 0.010</code></pre>
+<p>The <code>filter()</code> function works by taking the dataframe and the condition and column to filter with.</p>
+<div id="filtering-up-and-down-genes" class="section level3">
+<h3><span class="header-section-number">4.3.1</span> Filtering UP and DOWN genes</h3>
+<p>An elaboration of this is to find the up or down genes. To do this we need to build a filter on the <code>log2FoldChange</code> column. As the fold changes are encoded in a log scale, up regulated genes will have a positive value, down regulated genes will have a negative value</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">up_genes &lt;-<span class="st"> </span><span class="kw">filter</span>(results_data, padj <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>, log2FoldChange <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb34-2" data-line-number="2">up_genes</a></code></pre></div>
+<pre><code>##        gene  baseMean log2FoldChange     lfcSE     stat pvalue  padj
+## 1 MGG_01482 1912.4502      1.1010845 0.8063151 1.365576  0.005 0.004
+## 2 MGG_17878  988.8704      0.9095213 0.9142498 0.994828  0.002 0.010</code></pre>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1">down_genes &lt;-<span class="st"> </span><span class="kw">filter</span>(results_data, padj <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>, log2FoldChange <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb36-2" data-line-number="2">down_genes</a></code></pre></div>
+<pre><code>##        gene baseMean log2FoldChange    lfcSE     stat pvalue padj
+## 1 MGG_12738  552.417      -1.270054 1.196041 1.061881  0.005 0.03</code></pre>
+<p>Note that if you want to find values that are two fold up or down regulated, then you’ll need to change the <code>log2FoldChange</code> values to <code>1</code> and <code>-1</code> (as <code>log2(2) = 1</code> and <code>log2(0.5) = -1</code>).</p>
+<p>You can export each of these tables to files with <code>write.csv()</code> as previously.</p>
+</div>
+</div>
+<div id="finding-gene-annotations" class="section level2">
+<h2><span class="header-section-number">4.4</span> Finding gene annotations</h2>
+<p>A common question is ‘which pathways and functional categories do my genes belong to?’. Answering this requires quite an involved process, and doing it entirely in R is out of scope for this ‘minimal’ RNAseq tutorial. Instead of avoiding the question completely, we’ll look at how to achieve a basic annotation using webtools. Specifically, the Ensembl BioMart service.</p>
+<div id="biomart" class="section level3">
+<h3><span class="header-section-number">4.4.1</span> BioMart</h3>
+<p>BioMart is a data warehouse for genomic information that can be queried through a web interface. Not all genome projects provide such a service, but the ones on Ensembl generally do. We’ll work with the Magnaporthe one here, available at <a href="https://fungi.ensembl.org/Magnaporthe_oryzae/Info/Index">https://fungi.ensembl.org/Magnaporthe_oryzae/Info/Index</a></p>
+<p>To access it we need to click <code>BioMart</code> from the top menu, and be patient, it can take a little while to load.</p>
+<p>Then we need to follow this procedure to get a gene list annotated</p>
+<ol style="list-style-type: decimal">
+<li>From the <code>Choose Database</code> drop-down select <code>Ensembl Fungi Genes</code></li>
+<li>From the <code>Choose Dataset</code> drop down select <code>Magnaporthe oryzae genes (MG8)</code></li>
+<li>Select the <code>Attributes</code> page and on the <code>External</code> tab tick <code>GO Term Name</code>, <code>GO Term Definition</code> and <code>KEGG Pathway and Enzyme ID</code>. These attributes are the things you will retrieve from the BioMart.</li>
+<li>Select the <code>Filters</code> page and click on the <code>External</code> tab, paste in the gene IDs of interest into the box or upload a file.</li>
+<li>Click <code>Results</code> button at the top</li>
+</ol>
+<p>After a wait, the screen should fill with the annotations that you asked for. You can save this to a file using the <code>Export</code> options at the top.</p>
+<p>This is all you need to make an annotated gene list.</p>
+</div>
+</div>
+<div id="further-questions" class="section level2">
+<h2><span class="header-section-number">4.5</span> Further Questions</h2>
+<p>Of course, this isn’t all you might want to do with your RNAseq data and gene lists. We’ve achieved our overall goal of getting a minimal RNAseq analysis done. What happens next will be quite different for every experiment. For example, you might want to look at seeing whether a GO Term or enzymatic pathway is enriched. Pretty much everything will be a separate analysis in itself and will require some design and planning. Please feel free to talk to the bioinformatics team when you find yourself at this stage, we’ll be extremely happy to work with you!</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="running-deseq2.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["Minimal Quantitative RNASeq Pipeline.pdf", "Minimal Quantitative RNASeq Pipeline.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 7 Running an alignment on the HPC | A minimal quantitative RNAseq Pipeline</title>
+  <meta name="description" content="A minimal guide to performing quantitative RNAseq" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 7 Running an alignment on the HPC | A minimal quantitative RNAseq Pipeline" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="A minimal guide to performing quantitative RNAseq" />
+  <meta name="github-repo" content="TeamMacLean/minimal_quant_rna_seq" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 7 Running an alignment on the HPC | A minimal quantitative RNAseq Pipeline" />
+  
+  <meta name="twitter:description" content="A minimal guide to performing quantitative RNAseq" />
+  
+
+<meta name="author" content="Dan MacLean" />
+
+
+<meta name="date" content="2020-01-22" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="automating-the-process.html"/>
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A minimal alignment guide</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> About this course</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#prerequisites"><i class="fa fa-check"></i><b>1.1</b> Prerequisites</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#r-and-rstudio"><i class="fa fa-check"></i><b>1.1.1</b> R and RStudio</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#sample-reference-genome-and-reads"><i class="fa fa-check"></i><b>1.1.2</b> Sample reference genome and reads</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Counting Aligned Reads in Genomic Regions</a><ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#about-this-chapter"><i class="fa fa-check"></i><b>2.1</b> About this chapter</a></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#counting-the-number-of-reads-that-have-aligned-to-gene-regions"><i class="fa fa-check"></i><b>2.2</b> Counting the number of reads that have aligned to gene regions</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="intro.html"><a href="intro.html#atacr"><i class="fa fa-check"></i><b>2.2.1</b> atacR</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="intro.html"><a href="intro.html#preparing-the-input"><i class="fa fa-check"></i><b>2.3</b> Preparing the input</a><ul>
+<li class="chapter" data-level="2.3.1" data-path="intro.html"><a href="intro.html#the-gff-file"><i class="fa fa-check"></i><b>2.3.1</b> The GFF file</a></li>
+<li class="chapter" data-level="2.3.2" data-path="intro.html"><a href="intro.html#the-sample-information-file"><i class="fa fa-check"></i><b>2.3.2</b> The Sample Information file</a></li>
+<li class="chapter" data-level="2.3.3" data-path="intro.html"><a href="intro.html#the-bam-files"><i class="fa fa-check"></i><b>2.3.3</b> The BAM files</a></li>
+<li class="chapter" data-level="2.3.4" data-path="intro.html"><a href="intro.html#sample-files-for-this-chapter"><i class="fa fa-check"></i><b>2.3.4</b> Sample files for this chapter</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="intro.html"><a href="intro.html#running-make_counts"><i class="fa fa-check"></i><b>2.4</b> Running <code>make_counts()</code></a></li>
+<li class="chapter" data-level="2.5" data-path="intro.html"><a href="intro.html#summaries-and-diagnostic-plots"><i class="fa fa-check"></i><b>2.5</b> Summaries and Diagnostic plots</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="intro.html"><a href="intro.html#gene-count-plots"><i class="fa fa-check"></i><b>2.5.1</b> Gene Count Plots</a></li>
+<li class="chapter" data-level="2.5.2" data-path="intro.html"><a href="intro.html#comparing-samples-with-pca"><i class="fa fa-check"></i><b>2.5.2</b> Comparing Samples with PCA</a></li>
+</ul></li>
+<li class="chapter" data-level="2.6" data-path="intro.html"><a href="intro.html#extracting-and-saving-the-count-matrix"><i class="fa fa-check"></i><b>2.6</b> Extracting and saving the count matrix</a><ul>
+<li class="chapter" data-level="2.6.1" data-path="intro.html"><a href="intro.html#saving-to-an-r-rds-file"><i class="fa fa-check"></i><b>2.6.1</b> Saving to an R RDS file</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="running-minimap2.html"><a href="running-minimap2.html"><i class="fa fa-check"></i><b>3</b> Running <code>minimap2</code></a><ul>
+<li class="chapter" data-level="3.1" data-path="running-minimap2.html"><a href="running-minimap2.html#the-minimap2-command-and-options"><i class="fa fa-check"></i><b>3.1</b> The <code>minimap2</code> command and options</a></li>
+<li class="chapter" data-level="3.2" data-path="running-minimap2.html"><a href="running-minimap2.html#further-reading"><i class="fa fa-check"></i><b>3.2</b> Further Reading</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="running-minimap2.html"><a href="running-minimap2.html#the-operator"><i class="fa fa-check"></i><b>3.2.1</b> The <code>&gt;</code> operator</a></li>
+<li class="chapter" data-level="3.2.2" data-path="running-minimap2.html"><a href="running-minimap2.html#minimap2-further-instructions-and-github"><i class="fa fa-check"></i><b>3.2.2</b> <code>minimap2</code> further instructions and github</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="filtering-badly-aligned-reads.html"><a href="filtering-badly-aligned-reads.html"><i class="fa fa-check"></i><b>4</b> Filtering Badly Aligned Reads</a><ul>
+<li class="chapter" data-level="4.1" data-path="filtering-badly-aligned-reads.html"><a href="filtering-badly-aligned-reads.html#sam-format"><i class="fa fa-check"></i><b>4.1</b> SAM Format</a></li>
+<li class="chapter" data-level="4.2" data-path="filtering-badly-aligned-reads.html"><a href="filtering-badly-aligned-reads.html#samtools"><i class="fa fa-check"></i><b>4.2</b> <code>samtools</code></a></li>
+<li class="chapter" data-level="4.3" data-path="filtering-badly-aligned-reads.html"><a href="filtering-badly-aligned-reads.html#the-samtools-command-and-options"><i class="fa fa-check"></i><b>4.3</b> The <code>samtools</code> command and options</a></li>
+<li class="chapter" data-level="4.4" data-path="filtering-badly-aligned-reads.html"><a href="filtering-badly-aligned-reads.html#checking-the-filtering"><i class="fa fa-check"></i><b>4.4</b> Checking the filtering</a></li>
+<li class="chapter" data-level="4.5" data-path="filtering-badly-aligned-reads.html"><a href="filtering-badly-aligned-reads.html#are-we-done"><i class="fa fa-check"></i><b>4.5</b> Are we done?</a></li>
+<li class="chapter" data-level="4.6" data-path="filtering-badly-aligned-reads.html"><a href="filtering-badly-aligned-reads.html#further-reading-1"><i class="fa fa-check"></i><b>4.6</b> Further Reading</a><ul>
+<li class="chapter" data-level="4.6.1" data-path="filtering-badly-aligned-reads.html"><a href="filtering-badly-aligned-reads.html#sam-format-1"><i class="fa fa-check"></i><b>4.6.1</b> SAM Format</a></li>
+<li class="chapter" data-level="4.6.2" data-path="filtering-badly-aligned-reads.html"><a href="filtering-badly-aligned-reads.html#mapping-quality"><i class="fa fa-check"></i><b>4.6.2</b> Mapping Quality</a></li>
+<li class="chapter" data-level="4.6.3" data-path="filtering-badly-aligned-reads.html"><a href="filtering-badly-aligned-reads.html#flags"><i class="fa fa-check"></i><b>4.6.3</b> Flags</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="connecting-programs-and-compressing-output.html"><a href="connecting-programs-and-compressing-output.html"><i class="fa fa-check"></i><b>5</b> Connecting Programs and Compressing output</a><ul>
+<li class="chapter" data-level="5.1" data-path="connecting-programs-and-compressing-output.html"><a href="connecting-programs-and-compressing-output.html#bam-files"><i class="fa fa-check"></i><b>5.1</b> BAM Files</a></li>
+<li class="chapter" data-level="5.2" data-path="connecting-programs-and-compressing-output.html"><a href="connecting-programs-and-compressing-output.html#connecting-program-input-and-output-with-pipes"><i class="fa fa-check"></i><b>5.2</b> Connecting Program Input and Output With Pipes</a></li>
+<li class="chapter" data-level="5.3" data-path="connecting-programs-and-compressing-output.html"><a href="connecting-programs-and-compressing-output.html#from-reads-to-filtered-alignments-in-one-step"><i class="fa fa-check"></i><b>5.3</b> From reads to filtered alignments in one step</a><ul>
+<li class="chapter" data-level="5.3.1" data-path="connecting-programs-and-compressing-output.html"><a href="connecting-programs-and-compressing-output.html#from-reads-to-filtered-alignments-in-a-bam-file-in-one-step"><i class="fa fa-check"></i><b>5.3.1</b> From reads to filtered alignments in a BAM file in one step</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="connecting-programs-and-compressing-output.html"><a href="connecting-programs-and-compressing-output.html#sorting-bam-files"><i class="fa fa-check"></i><b>5.4</b> Sorting BAM files</a><ul>
+<li class="chapter" data-level="5.4.1" data-path="connecting-programs-and-compressing-output.html"><a href="connecting-programs-and-compressing-output.html#automatically-deleting-the-unsorted-bam"><i class="fa fa-check"></i><b>5.4.1</b> Automatically deleting the unsorted BAM</a></li>
+</ul></li>
+<li class="chapter" data-level="5.5" data-path="connecting-programs-and-compressing-output.html"><a href="connecting-programs-and-compressing-output.html#indexing-the-sorted-bam"><i class="fa fa-check"></i><b>5.5</b> Indexing the sorted BAM</a></li>
+<li class="chapter" data-level="5.6" data-path="connecting-programs-and-compressing-output.html"><a href="connecting-programs-and-compressing-output.html#further-reading-2"><i class="fa fa-check"></i><b>5.6</b> Further Reading</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="automating-the-process.html"><a href="automating-the-process.html"><i class="fa fa-check"></i><b>6</b> Automating The Process</a><ul>
+<li class="chapter" data-level="6.1" data-path="automating-the-process.html"><a href="automating-the-process.html#shell-scripts"><i class="fa fa-check"></i><b>6.1</b> Shell scripts</a><ul>
+<li class="chapter" data-level="6.1.1" data-path="automating-the-process.html"><a href="automating-the-process.html#using-nano-to-create-a-shell-script"><i class="fa fa-check"></i><b>6.1.1</b> Using <code>nano</code> to create a shell script</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="automating-the-process.html"><a href="automating-the-process.html#creating-a-script-that-automates-our-alignment-pipeline."><i class="fa fa-check"></i><b>6.2</b> Creating a script that automates our alignment pipeline.</a></li>
+<li class="chapter" data-level="6.3" data-path="automating-the-process.html"><a href="automating-the-process.html#running-the-script"><i class="fa fa-check"></i><b>6.3</b> Running the script</a></li>
+<li class="chapter" data-level="6.4" data-path="automating-the-process.html"><a href="automating-the-process.html#running-on-different-input-files"><i class="fa fa-check"></i><b>6.4</b> Running on different input files</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="running-an-alignment-on-the-hpc.html"><a href="running-an-alignment-on-the-hpc.html"><i class="fa fa-check"></i><b>7</b> Running an alignment on the HPC</a><ul>
+<li class="chapter" data-level="7.1" data-path="running-an-alignment-on-the-hpc.html"><a href="running-an-alignment-on-the-hpc.html#an-hpc-is-a-group-of-slave-computers-under-control-of-a-master-computer"><i class="fa fa-check"></i><b>7.1</b> An HPC is a group of slave computers under control of a master computer</a></li>
+<li class="chapter" data-level="7.2" data-path="running-an-alignment-on-the-hpc.html"><a href="running-an-alignment-on-the-hpc.html#logging-into-the-submission-node"><i class="fa fa-check"></i><b>7.2</b> Logging into the submission node</a></li>
+<li class="chapter" data-level="7.3" data-path="running-an-alignment-on-the-hpc.html"><a href="running-an-alignment-on-the-hpc.html#preparing-a-job"><i class="fa fa-check"></i><b>7.3</b> Preparing a job</a><ul>
+<li class="chapter" data-level="7.3.1" data-path="running-an-alignment-on-the-hpc.html"><a href="running-an-alignment-on-the-hpc.html#the-sbatch-options"><i class="fa fa-check"></i><b>7.3.1</b> The <code>#SBATCH</code> options</a></li>
+<li class="chapter" data-level="7.3.2" data-path="running-an-alignment-on-the-hpc.html"><a href="running-an-alignment-on-the-hpc.html#the-source-options"><i class="fa fa-check"></i><b>7.3.2</b> The <code>source</code> options</a></li>
+<li class="chapter" data-level="7.3.3" data-path="running-an-alignment-on-the-hpc.html"><a href="running-an-alignment-on-the-hpc.html#the-srun-command"><i class="fa fa-check"></i><b>7.3.3</b> The <code>srun</code> command</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="running-an-alignment-on-the-hpc.html"><a href="running-an-alignment-on-the-hpc.html#submitting-with-sbatch"><i class="fa fa-check"></i><b>7.4</b> Submitting with <code>sbatch</code></a></li>
+<li class="chapter" data-level="7.5" data-path="running-an-alignment-on-the-hpc.html"><a href="running-an-alignment-on-the-hpc.html#checkout-tasks"><i class="fa fa-check"></i><b>7.5</b> Checkout tasks</a></li>
+<li class="chapter" data-level="7.6" data-path="running-an-alignment-on-the-hpc.html"><a href="running-an-alignment-on-the-hpc.html#further-reading-3"><i class="fa fa-check"></i><b>7.6</b> Further Reading</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A minimal quantitative RNAseq Pipeline</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="running-an-alignment-on-the-hpc" class="section level1">
+<h1><span class="header-section-number">Chapter 7</span> Running an alignment on the HPC</h1>
+<p>In this chapter we’ll look at how to run the alignment on an HPC cluster. First, we need to know a few things about that HPC before we can begin.</p>
+<div id="an-hpc-is-a-group-of-slave-computers-under-control-of-a-master-computer" class="section level2">
+<h2><span class="header-section-number">7.1</span> An HPC is a group of slave computers under control of a master computer</h2>
+<p>Most of the computers in an HPC cluster are really just there to do what one other computer tells them. They cannot be contacted directly (by the normal user) and they have very little software already on them. As the user you must get a master computer to tell them what to do. A key thing about an HPC cluster is that all the computers share one massive hard-drive. Look at the diagram below.</p>
+<p><img src="hpc_graphic.png" /></p>
+<p>It shows the computer you are working at, the master computer and it’s relation to the slave computers and the hard disk. Note that there is no way for you to contact the slaves directly, even though the slaves (or more properly ‘worker nodes’) are where the actual job runs. So the workflow for running an HPC job goes like this</p>
+<ol style="list-style-type: decimal">
+<li>Log into master (more usually called ‘submission node’ )</li>
+<li>Prepare a task for the submission node to send to the nodes</li>
+<li>Submit the task to the submission node</li>
+<li>Wait for the submission node to send the job to the worker nodes</li>
+<li>Wait for the worker nodes to finish the job</li>
+</ol>
+<p>In the rest of this chapter we’ll look at how to do these steps</p>
+</div>
+<div id="logging-into-the-submission-node" class="section level2">
+<h2><span class="header-section-number">7.2</span> Logging into the submission node</h2>
+<p>This is pretty straightforward, you need to use the <code>ssh</code> command to make a connection between your computer and the submission node. The TSL submission node has the address <code>hpc.tsl.ac.uk</code> so use this command</p>
+<pre><code>ssh hpc.tsl.ac.uk</code></pre>
+<p>You’ll be asked for a user name and password, it’s your usual NBI details. When it’s done you should see something like this</p>
+<p><img src="login.png" /></p>
+<p>This terminal is now working on the submission node (you can tell from the prompt <code>macleand@TSL-HPC</code>)</p>
+</div>
+<div id="preparing-a-job" class="section level2">
+<h2><span class="header-section-number">7.3</span> Preparing a job</h2>
+<p>To run a job we need to create a submission script. <code>nano</code> is available on the submission node, so we can use that. But what goes inside? Here’s a typical one.</p>
+<pre><code>#!/bin/bash
+
+#SBATCH -p tsl-short
+#SBATCH --mem=16G
+#SBATCH -c 4
+#SBATCH -J alignments
+#SBATCH --mail-type=begin,end,fail
+#SBATCH --mail-user=dan.maclean@tsl.ac.uk
+#SBATCH -o alignments.%j.out
+#SBATCH -e slurm.%j.err
+
+source minimap2-2.5
+source samtools-1.9
+
+srun minimap2 -ax sr ecoli_genome.fa ecoli_left_R1.fq ecoli_right_R2.fq | samtools view -S -h -b -q 25 -f 3 &gt; aln.script.bam
+</code></pre>
+<p>Not much of this is going to be familiar, but it isn’t complicated.</p>
+<p>The first line of this file <code>#!/bin/bash</code> is one that should always be there. Always put it in and never worry about it again. It just tells the computer this file is a script.</p>
+<div id="the-sbatch-options" class="section level3">
+<h3><span class="header-section-number">7.3.1</span> The <code>#SBATCH</code> options</h3>
+<p>The second block of statements, all beginning <code>#SBATCH</code> are the resource options for the job. It tells the submission node what resources the job needs to run. These need to go at the top of the script. Let’s look at them individually.</p>
+<div id="sbatch--p" class="section level4">
+<h4><span class="header-section-number">7.3.1.1</span> <code>#SBATCH -p</code></h4>
+<p>This tells the submission node which queue (or partition in the jargon) the job should run on. We have three basic partitions <code>tsl-short</code>, <code>tsl-medium</code> and <code>tsl-long</code>. The main difference is that jobs that run for a short time shouldn’t be held back by jobs that run for ages, so the submission node uses this to run all of its jobs optimally.</p>
+</div>
+<div id="sbatch--c" class="section level4">
+<h4><span class="header-section-number">7.3.1.2</span> <code>#SBATCH -c</code></h4>
+<p>The number here tells the machine how many CPU’s (processors) to use. Most tools will be able to make use of more than one and will run faster as a consequence. The job (usually) won’t fail if you get this wrong, but it will take longer to start as it waits for more CPU’s to come free.</p>
+</div>
+<div id="sbatch---mem" class="section level4">
+<h4><span class="header-section-number">7.3.1.3</span> <code>#SBATCH --mem=</code></h4>
+<p>This tells the submission node how much memory your job will need to run. Jobs that exceed their stated memory by too much are killed. REquestiing the lowest possible memory means your job will be executed more quickly. Memory is requested in units of <code>G</code> gigabytes, usually.</p>
+</div>
+<div id="sbatch--j" class="section level4">
+<h4><span class="header-section-number">7.3.1.4</span> <code>#SBATCH -J</code></h4>
+<p>This is a helpful little name for you to identify your jobs with. eg <code>#SBATCH -J my_jobs</code></p>
+</div>
+<div id="sbatch---mail-type" class="section level4">
+<h4><span class="header-section-number">7.3.1.5</span> <code>#SBATCH --mail-type=</code></h4>
+<p>These are the times during the job that the submission node will email you to let you know of a status change in your job. Always use this option as presented for quickest information.</p>
+</div>
+<div id="sbatch---mail-user" class="section level4">
+<h4><span class="header-section-number">7.3.1.6</span> <code>#SBATCH --mail-user</code></h4>
+<p>This is simply the address your update emails will be sent to.</p>
+</div>
+<div id="sbatch--o-and-sbatch--e" class="section level4">
+<h4><span class="header-section-number">7.3.1.7</span> <code>#SBATCH -o</code> and <code>#SBATCH -e</code></h4>
+<p>These are the names of files that output and errors will be sent to. On a long running process the output can get long so it goes to a file, not the email. The weird <code>%j</code> is a job ID number that uniquely identifies the job.</p>
+</div>
+</div>
+<div id="the-source-options" class="section level3">
+<h3><span class="header-section-number">7.3.2</span> The <code>source</code> options</h3>
+<p>The next lines all begin with the word <code>source</code> followed by some software name. No software is loaded into the worker nodes by default, so we need to say which tools we want to use. Do this by using the <code>source</code> keyword followed by the software name, e.g <code>source BLAST-2.2.2</code>. Many versions of the same tool are available on the HPC, and are differentiated by the version number at the end. You can see which software is available to source by typing <code>source</code> then hitting the tab key twice. It should give a very long list of tools.</p>
+</div>
+<div id="the-srun-command" class="section level3">
+<h3><span class="header-section-number">7.3.3</span> The <code>srun</code> command</h3>
+<p>Finally, we get to the actual commands we want to run. This is exactly as we did before but with the command <code>srun</code> in front.</p>
+</div>
+</div>
+<div id="submitting-with-sbatch" class="section level2">
+<h2><span class="header-section-number">7.4</span> Submitting with <code>sbatch</code></h2>
+<p>All of this information should be saved in a single script. You can call it what you want, but use the extension <code>.sh</code>. Once you’ve got this script, you can ask the submission node to add your job to the queue with <code>sbatch</code>. This doesn’t go in the script, it goes on the command-line, so if you’d added all the details above to a file called <code>do_my_alignments.sh</code> you can submit it by typing <code>sbatch do_my_alignments.sh</code></p>
+</div>
+<div id="checkout-tasks" class="section level2">
+<h2><span class="header-section-number">7.5</span> Checkout tasks</h2>
+<p>So that’s all you need to know to submit a job. Let’s test how that works by creating a simple job and running that. Then we’ll try a bigger alignment job. These are</p>
+<ol style="list-style-type: decimal">
+<li>Create a job using a submission script that runs this command <code>date</code>. Check what the <code>date</code> command does on the command line. Note that it runs very quickly (is a short job) and uses very little memory (&lt; 1G) and only needs one CPU.</li>
+<li>What happened to the output? Check the contents of your directory when the job is done and examine the new files (<code>less</code> is useful for this).</li>
+<li>Explicitly create an output file by running this command through the HPC instead <code>date &gt; date.txt</code>. What is the contents of the folder now? What effect did explicitly naming an output file have. What is the <code>slurm_xxxx.out</code> file for?</li>
+<li>Run an alignment job using the information we learned in the earlier chapters. The reference file <code>ecoli_genome.fa</code>, <code>ecoli_left_R1.fq</code>, <code>ecoli_right_R2.fq</code> are available in the HPC filesystem in the folder. <code>/tsl/data/reads/bioinformatics/tutorial/alignments/</code></li>
+</ol>
+</div>
+<div id="further-reading-3" class="section level2">
+<h2><span class="header-section-number">7.6</span> Further Reading</h2>
+<p>You can see more information about the cluster submission system and options at the CiS <a href="https://docs.cis.nbi.ac.uk/display/CIS/Run+a+simple+job+on+the+cluster">documentation site</a></p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="automating-the-process.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["Basic Read Alignment.pdf", "Basic Read Alignment.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
