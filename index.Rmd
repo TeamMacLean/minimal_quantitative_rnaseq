@@ -62,9 +62,9 @@ Type the following into the RStudio console, `BiocManager::install("DESeq")`
 
 Now you are done! Everything is installed ready for you to work with. Next we need to get the sample data
 
-### Sample reference genome and reads
+### Sample BAM file and counts files
 
-You'll need this zip file of data: [sample_data.zip](https://github.com/TeamMacLean/basic_alignment/raw/master/sample_data/sample_data.zip) which contains a reference genome and a set of paired end reads. Download it, extract the files and put them into a folder on your machine. I suggest something like `Desktop/align_tut`. This will be the directory we'll work from in the rest of the course.
+You'll need this zip file of data: [sample_data.zip](https://github.com/TeamMacLean/minimal_quantitative_rnaseq/blob/master/sample_data/sample_data.zip) which contains a lot of ifles including BAM files and counts. Download it, extract the files and put them into a folder on your machine. I suggest something like `Desktop/align_tut`. This will be the directory we'll work from in the rest of the course.
 
 That's all you need to do the lesson. If you have any problems getting this going, then ask someone in the Bioinformatics Team and we'll help.
 
